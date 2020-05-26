@@ -14,4 +14,3 @@ spring:
     user:
       name: user
       password: pass
-      
