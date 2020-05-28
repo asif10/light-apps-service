@@ -6,11 +6,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
+
 /**
  * @author Asif Akhtar
  * 25/05/2020 23:44
  */
-@CrossOrigin(origins = "http://localhost:4201")
 @RestController
 @RequestMapping("/api/v1")
 @Slf4j
@@ -20,8 +21,8 @@ public class BasicAuthController {
         return new AuthenticationBean("You are authenticated");
     }
 
-    @GetMapping(path = "/logout-success")
-    public void logoutSuccess() {
-        log.info("Logged Out");
+    @RequestMapping("/user")
+    public Principal user(Principal user) {
+        return user;
     }
 }
