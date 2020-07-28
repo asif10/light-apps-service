@@ -39,3 +39,13 @@ dependencies {
 test {
 	useJUnitPlatform()
 }
+
+repositories {
+	maven {
+		credentials {
+			username nexusUsername
+			password nexusPassword
+		}
+		url { nexusPublic }
+	}
+}
