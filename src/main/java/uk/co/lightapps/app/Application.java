@@ -1,13 +1,13 @@
-package uk.co.lightapps.app.earnings;
+package uk.co.lightapps.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class EarningsApplication {
+public class Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(EarningsApplication.class, args);
+		SpringApplication.run(Application.class, args);
 	}
 
 }
