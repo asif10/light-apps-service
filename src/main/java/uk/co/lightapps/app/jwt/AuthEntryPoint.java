@@ -1,4 +1,4 @@
-package uk.co.lightapps.app.earnings.jwt;
+package uk.co.lightapps.app.jwt;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;

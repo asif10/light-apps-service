@@ -1,0 +1,14 @@
+version: "3"
+services:
+  light-apps-db:
+    image: mongo:3.2.4
+    container_name: "light-apps"
+    ports:
+      - 27017:27017
+    command: --smallfiles
+  api:
+    image: mongo
+    ports:
+      - 9091:8080
+    links:
+      - light-apps-db

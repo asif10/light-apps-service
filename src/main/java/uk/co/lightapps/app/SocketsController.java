@@ -1,4 +1,4 @@
-package uk.co.lightapps.app.earnings;
+package uk.co.lightapps.app;
 
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;

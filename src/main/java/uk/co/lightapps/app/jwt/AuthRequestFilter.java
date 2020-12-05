@@ -1,4 +1,4 @@
-package uk.co.lightapps.app.earnings.jwt;
+package uk.co.lightapps.app.jwt;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;

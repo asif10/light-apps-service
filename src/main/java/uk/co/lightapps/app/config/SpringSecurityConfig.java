@@ -1,4 +1,4 @@
-package uk.co.lightapps.app.earnings.config;
+package uk.co.lightapps.app.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import uk.co.lightapps.app.earnings.jwt.AuthEntryPoint;
-import uk.co.lightapps.app.earnings.jwt.AuthRequestFilter;
+import uk.co.lightapps.app.jwt.AuthEntryPoint;
+import uk.co.lightapps.app.jwt.AuthRequestFilter;
 
 import static org.springframework.http.HttpStatus.OK;
 

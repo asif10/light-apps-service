@@ -1,4 +1,4 @@
-package uk.co.lightapps.app.earnings;
+package uk.co.lightapps.app;
 
 import lombok.Data;
 

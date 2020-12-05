@@ -1,4 +1,4 @@
-package uk.co.lightapps.app.earnings.jwt;
+package uk.co.lightapps.app.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -18,7 +18,7 @@ import java.util.function.Function;
  */
 @Component
 public class JwtTokenUtil {
-    public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+    public static final long JWT_TOKEN_VALIDITY = 60 * 60 * 60;
     @Value("${jwt.secret}")
     private String secret;
 

@@ -1,0 +1,30 @@
+db
+use lightapps
+
+
+Create the user administrator.
+
+use admin
+db.createUser(
+  {
+    user: "alightapps",
+    pwd: passwordPrompt(), // or cleartext password
+    roles: [ { role: "userAdminAnyDatabase", db: "admin" }, "readWriteAnyDatabase" ]
+  }
+)
+
+login
+use admin
+db.auth("alightapps")
+
+
+use light-apps
+db.createUser(
+  {
+    user: "lightapps",
+    pwd:  "lightapps",   // or cleartext password
+    roles: [ { role: "readWrite", db: "light-apps" } ]
+  }
+)
+
+mongo --port 27017 -u "lightapps" --authenticationDatabase "light-apps" -p

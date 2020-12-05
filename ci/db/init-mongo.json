@@ -1,0 +1,8 @@
+use light-apps
+db.createUser(
+    {
+        user: "lightapps",
+        pwd:  "lightapps",   // or cleartext password
+        roles: [ { role: "readWrite", db: "light-apps" } ]
+    }
+)

@@ -1,9 +1,7 @@
-package uk.co.lightapps.app.earnings;
+package uk.co.lightapps.app;
 
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

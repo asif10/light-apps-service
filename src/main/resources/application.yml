@@ -7,9 +7,9 @@ spring.jackson:
 spring:
   data:
     mongodb:
-      database: assets-tracker
-      username: assets
-      password: assets1
+      database: light-apps
+      username: lightapps
+      password: lightapps
   security:
     user:
       name: user

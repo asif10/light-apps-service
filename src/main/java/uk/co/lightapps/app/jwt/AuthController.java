@@ -1,4 +1,4 @@
-package uk.co.lightapps.app.earnings.jwt;
+package uk.co.lightapps.app.jwt;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -7,8 +7,8 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import uk.co.lightapps.app.earnings.jwt.domain.AuthRequest;
-import uk.co.lightapps.app.earnings.jwt.domain.JwtResponse;
+import uk.co.lightapps.app.jwt.domain.AuthRequest;
+import uk.co.lightapps.app.jwt.domain.JwtResponse;
 
 /**
  * @author Asif Akhtar

@@ -1,4 +1,4 @@
-package uk.co.lightapps.app.earnings.config;
+package uk.co.lightapps.app.config;
 
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;

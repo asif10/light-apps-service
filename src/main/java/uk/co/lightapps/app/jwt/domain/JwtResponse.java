@@ -1,4 +1,4 @@
-package uk.co.lightapps.app.earnings.jwt.domain;
+package uk.co.lightapps.app.jwt.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
