@@ -1,4 +1,4 @@
-package uk.co.lightapps.app.forex;
+package uk.co.lightapps.app.forex.trades.domain;
 
 /**
  * @author Asif Akhtar

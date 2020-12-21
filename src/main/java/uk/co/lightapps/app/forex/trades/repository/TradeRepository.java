@@ -1,7 +1,8 @@
-package uk.co.lightapps.app.forex;
+package uk.co.lightapps.app.forex.trades.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
+import uk.co.lightapps.app.forex.trades.domain.Trade;
 
 /**
  * @author Asif Akhtar

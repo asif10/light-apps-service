@@ -1,4 +1,4 @@
-package uk.co.lightapps.app.forex;
+package uk.co.lightapps.app.forex.trades.domain;
 
 /**
  * @author Asif Akhtar
@@ -6,5 +6,5 @@ package uk.co.lightapps.app.forex;
  */
 public enum Pair {
     EURUSD, USDCHF, GOLD, AUDCHF, GBPUSD, EURNZD, USDCAD, GBPJPY, CADCHF, AUDNZD, CADJPY, EURCAD, EURAUD,
-    NZDUSD, CHFJPY, AUDUSD, EURJPY,AUDJPY
+    NZDUSD, CHFJPY, AUDUSD, EURJPY,AUDJPY,GBPCAD,AUDCAD,NZDCAD,USDTRY,EURCHF,USDJPY,EURGBP
 }

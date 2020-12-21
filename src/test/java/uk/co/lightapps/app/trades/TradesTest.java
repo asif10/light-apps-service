@@ -6,23 +6,19 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.co.lightapps.app.forex.Trade;
-import uk.co.lightapps.app.forex.TradeService;
+import uk.co.lightapps.app.forex.trades.domain.Trade;
+import uk.co.lightapps.app.forex.trades.services.TradeService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static uk.co.lightapps.app.forex.Client.IQ;
-import static uk.co.lightapps.app.forex.Client.P500;
-import static uk.co.lightapps.app.forex.Pair.EURUSD;
-import static uk.co.lightapps.app.forex.TradeType.LONG;
-import static uk.co.lightapps.app.forex.TradeType.SHORT;
+import static uk.co.lightapps.app.forex.trades.domain.Client.IQ;
+import static uk.co.lightapps.app.forex.trades.domain.Pair.EURUSD;
+import static uk.co.lightapps.app.forex.trades.domain.TradeType.LONG;
 
 /**
  * @author Asif Akhtar

@@ -1,4 +1,4 @@
-package uk.co.lightapps.app.forex;
+package uk.co.lightapps.app.forex.trades.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,8 +10,6 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-import static uk.co.lightapps.app.forex.TradeType.SHORT;
-
 /**
  * @author Asif Akhtar
  * 18/10/2020 22:37
@@ -19,7 +17,7 @@ import static uk.co.lightapps.app.forex.TradeType.SHORT;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document
+@Document("Trade")
 public class Trade {
     @Id
     private String tradeId;

@@ -1,15 +1,18 @@
-package uk.co.lightapps.app.forex;
+package uk.co.lightapps.app.forex.trades.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.co.lightapps.app.forex.trades.domain.Trade;
+import uk.co.lightapps.app.forex.trades.repository.TradeRepository;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
-import static java.math.RoundingMode.HALF_UP;
+import java.util.stream.Collectors;
 
 /**
  * @author Asif Akhtar
@@ -42,6 +45,14 @@ public class TradeService {
         return repository.findAll();
     }
 
+    public List<Trade> getOpenTrades() {
+        return getAll().stream().filter(this::isOpen).collect(Collectors.toList());
+    }
+
+    private boolean isOpen(Trade trade) {
+        return Objects.isNull(trade.getStatus()) || trade.getStatus().equals("-");
+    }
+
     public void deleteAll() {
         repository.deleteAll();
     }
@@ -57,5 +68,11 @@ public class TradeService {
     public void closeTrade(String status, Trade trade, double close, int pips, double rr) {
         trade.closeTrade(status, close, pips, rr);
         save(trade);
+    }
+
+    public List<Trade> getAll(LocalDate date) {
+        LocalDateTime start = LocalDateTime.of(date, LocalTime.MIN);
+        LocalDateTime end = LocalDateTime.of(date, LocalTime.MAX);
+        return getAll().stream().filter(e -> e.getDate().compareTo(start) >= 0 && e.getDate().compareTo(end) <= 1).collect(Collectors.toList());
     }
 }
