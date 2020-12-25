@@ -1,6 +1,7 @@
 package uk.co.lightapps.app.forex.trades.domain;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -17,7 +18,8 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document("Trade")
+@Document("Trades")
+@Builder
 public class Trade {
     @Id
     private String tradeId;
@@ -27,6 +29,7 @@ public class Trade {
     private String strategy;
     private TradeType type;
     private double account;
+    private double invested;
     private double accountP;
     private double open;
     private double lot;
@@ -38,13 +41,13 @@ public class Trade {
     private double profit;
     private double profitP;
 
-    public static Trade opened(Client client, Pair pair, String strategy, TradeType type, double account, double open, double lot, double rr) {
-        return opened(LocalDateTime.now(), client, pair, strategy, type, account, open, lot, rr);
-    }
-
-    public static Trade opened(LocalDateTime date, Client client, Pair pair, String strategy, TradeType type, double account, double open, double lot, double rr) {
-        return new Trade(UUID.randomUUID().toString(), date, client, pair, strategy, type, account, 0, open, lot, open, 0, 0, null, rr, 0, 0);
-    }
+//    public static Trade opened(Client client, Pair pair, String strategy, TradeType type, double account, double invested, double open, double lot, double rr) {
+//        return opened(LocalDateTime.now(), client, pair, strategy, type, account, invested, open, lot, rr);
+//    }
+//
+//    public static Trade opened(LocalDateTime date, Client client, Pair pair, String strategy, TradeType type, double account, double invested, double open, double lot, double rr) {
+//        return new Trade(UUID.randomUUID().toString(), date, client, pair, strategy, type, account, invested, 0, open, lot, open, 0, 0, null, rr, 0, 0);
+//    }
 
     public void closeTrade(String status, double close, double pips, double rr) {
         this.status = status;
@@ -54,6 +57,7 @@ public class Trade {
         this.profit = close - open;
         this.profitP = profit / open;
         this.accountP = open / account;
+        this.invested = profit / account;
     }
 
     public boolean isActive() {

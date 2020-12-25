@@ -70,9 +70,18 @@ public class TradeService {
         save(trade);
     }
 
+    public void closeTrade(String status, Trade trade) {
+        trade.closeTrade(status, trade.getClose(), trade.getPips(), trade.getRr());
+        save(trade);
+    }
+
     public List<Trade> getAll(LocalDate date) {
         LocalDateTime start = LocalDateTime.of(date, LocalTime.MIN);
         LocalDateTime end = LocalDateTime.of(date, LocalTime.MAX);
         return getAll().stream().filter(e -> e.getDate().compareTo(start) >= 0 && e.getDate().compareTo(end) <= 1).collect(Collectors.toList());
+    }
+
+    public void delete(String tradeId) {
+        repository.deleteById(tradeId);
     }
 }

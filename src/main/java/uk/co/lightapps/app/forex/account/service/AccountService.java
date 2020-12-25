@@ -7,9 +7,9 @@ import uk.co.lightapps.app.forex.account.domain.Figure;
 import uk.co.lightapps.app.forex.account.domain.TradeStats;
 import uk.co.lightapps.app.forex.trades.domain.Trade;
 import uk.co.lightapps.app.forex.trades.services.TradeService;
+import uk.co.lightapps.app.forex.transactions.services.TransactionService;
 
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,18 +21,15 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class AccountService {
-    private double STATS_ACCOUNT_P5 = 232;
-    private double STATS_ACCOUNT_IQ = 112.37;
-    private double STATS_DEPOSIT_P5 = 400;
-    private double STATS_DEPOSIT_IQ = 200;
     private final TradeService tradeService;
+    private final TransactionService transactionService;
 
     public double calculateCurrentBalance() {
         return calculateStartBalance() + sumTradesReturnValue() + sumTradesFeesValue();
     }
 
     public double calculateStartBalance() {
-        return STATS_ACCOUNT_P5 + STATS_ACCOUNT_IQ;
+        return transactionService.getBalance();
     }
 
     public double sumTradesReturnValue() {
@@ -44,7 +41,7 @@ public class AccountService {
     }
 
     public double calculateDepositAmount() {
-        return STATS_DEPOSIT_IQ + STATS_DEPOSIT_P5;
+        return transactionService.getDepositBalance();
     }
 
     public Figure calculateCurrentPosition() {

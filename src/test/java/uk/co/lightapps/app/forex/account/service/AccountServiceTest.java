@@ -117,11 +117,11 @@ public class AccountServiceTest {
         assertThat(round(account.getOpenProfitIncFees().getValue()), is(-1.19));
     }
 
-    private double round(double value) {
+    public static double round(double value) {
         return new BigDecimal("" + value).setScale(2, RoundingMode.HALF_UP).doubleValue();
     }
 
-    private double roundP(double value) {
+    public static double roundP(double value) {
         return new BigDecimal("" + value).setScale(4, RoundingMode.HALF_UP).doubleValue();
     }
 

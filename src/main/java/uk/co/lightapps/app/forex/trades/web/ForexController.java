@@ -53,6 +53,12 @@ public class ForexController {
         return service.save(trade);
     }
 
+    @DeleteMapping(value = "/delete/{tradeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void save(@PathVariable("tradeId") String tradeId) {
+        log.info("Trade to delete - " + tradeId);
+        service.delete(tradeId);
+    }
+
     @PostMapping(value = "/positions/daily/save")
     public DailyPosition saveDailyPosition() {
         return positionsService.logDaily(LocalDate.now());
