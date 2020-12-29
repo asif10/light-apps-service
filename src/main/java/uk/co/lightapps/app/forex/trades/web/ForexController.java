@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import uk.co.lightapps.app.forex.account.domain.Account;
 import uk.co.lightapps.app.forex.positions.domain.DailyPosition;
 import uk.co.lightapps.app.forex.positions.service.PositionsService;
+import uk.co.lightapps.app.forex.strategies.domain.Strategies;
+import uk.co.lightapps.app.forex.strategies.services.StrategiesService;
 import uk.co.lightapps.app.forex.trades.services.TradeService;
 import uk.co.lightapps.app.forex.trades.domain.Trade;
 
@@ -26,6 +28,7 @@ import java.util.List;
 public class ForexController {
     private final TradeService service;
     private final PositionsService positionsService;
+    private final StrategiesService strategiesService;
 
     @GetMapping(value = "/trades")
     public List<Trade> trades() {
@@ -69,5 +72,10 @@ public class ForexController {
         List<DailyPosition> positions = positionsService.getAll();
         Collections.reverse(positions);
         return positions;
+    }
+
+    @GetMapping(value = "/strategies/all")
+    public List<Strategies> getStrategies() {
+        return strategiesService.getAllStrategies();
     }
 }

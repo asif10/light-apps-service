@@ -84,4 +84,8 @@ public class TradeService {
     public void delete(String tradeId) {
         repository.deleteById(tradeId);
     }
+
+    public List<Trade> getByStrategy(int strategy) {
+        return getAll().stream().filter(e -> e.getStrategy().equals("" + strategy)).collect(Collectors.toList());
+    }
 }
