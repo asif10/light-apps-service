@@ -1,0 +1,15 @@
+spring.jackson:
+  date-format: yyyy-MM-dd HH:mm:ss
+
+spring:
+  data:
+    mongodb:
+      database: light-apps-test
+      username: test
+      password: test
+  security:
+    user:
+      name: user
+      password: pass
+jwt:
+  secret: javainuse

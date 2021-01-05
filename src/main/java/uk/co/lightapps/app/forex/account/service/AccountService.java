@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.co.lightapps.app.forex.account.domain.Account;
 import uk.co.lightapps.app.forex.account.domain.Figure;
 import uk.co.lightapps.app.forex.account.domain.TradeStats;
+import uk.co.lightapps.app.forex.positions.domain.WeeklyPosition;
 import uk.co.lightapps.app.forex.trades.domain.Trade;
 import uk.co.lightapps.app.forex.trades.services.TradeService;
 import uk.co.lightapps.app.forex.transactions.services.TransactionService;
@@ -12,6 +13,7 @@ import uk.co.lightapps.app.forex.transactions.services.TransactionService;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -144,11 +146,19 @@ public class AccountService {
         return profit + fees;
     }
 
+    /**
+     * Hard coded from excel, using losses off first days trades
+     *
+     * @return
+     */
     private double calculateAvailableTradesOnStart() {
-        return calculateStartBalance() / 10;
+        return 33968;
     }
 
     private double calculateAvailableTrades() {
-        return calculateCurrentBalance() / 10;
+        double profit = calculateProfit().getValue();
+        List<Trade> trades = tradeService.getAll();
+        double returnPerTrade = profit / trades.size();
+        return Math.abs(calculateCurrentBalance() / returnPerTrade);
     }
 }

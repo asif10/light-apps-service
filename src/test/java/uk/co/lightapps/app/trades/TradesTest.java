@@ -1,6 +1,7 @@
 package uk.co.lightapps.app.trades;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import static uk.co.lightapps.app.forex.trades.domain.TradeType.LONG;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Ignore
 public class TradesTest {
     @Autowired
     private TradeService service;
@@ -96,5 +98,9 @@ public class TradesTest {
 
     public static double rounded(double amount) {
         return new BigDecimal("" + amount).setScale(4, RoundingMode.HALF_UP).doubleValue();
+    }
+
+    public static double rounded2dp(double amount) {
+        return new BigDecimal("" + amount).setScale(2, RoundingMode.HALF_UP).doubleValue();
     }
 }

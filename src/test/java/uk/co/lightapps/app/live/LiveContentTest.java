@@ -5,28 +5,29 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.lightapps.app.forex.positions.domain.DailyPosition;
 import uk.co.lightapps.app.forex.positions.service.PositionsService;
 import uk.co.lightapps.app.forex.trades.domain.Pair;
 import uk.co.lightapps.app.forex.trades.domain.Trade;
-import uk.co.lightapps.app.forex.trades.services.TradeService;
 import uk.co.lightapps.app.forex.trades.domain.TradeType;
-import uk.co.lightapps.app.forex.transactions.domain.Transaction;
+import uk.co.lightapps.app.forex.trades.services.TradeService;
 import uk.co.lightapps.app.forex.transactions.services.TransactionService;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static java.lang.Double.*;
+import static java.lang.Double.parseDouble;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.time.LocalDateTime.of;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static uk.co.lightapps.app.forex.trades.domain.Client.IQ;
-import static uk.co.lightapps.app.forex.transactions.domain.Transaction.*;
+import static uk.co.lightapps.app.forex.transactions.domain.Transaction.deposit;
+import static uk.co.lightapps.app.forex.transactions.domain.Transaction.opening;
 
 /**
  * @author Asif Akhtar
@@ -34,6 +35,7 @@ import static uk.co.lightapps.app.forex.transactions.domain.Transaction.*;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@ActiveProfiles("live")
 //@Ignore
 public class LiveContentTest {
     @Autowired
@@ -77,7 +79,7 @@ public class LiveContentTest {
     @Test
     public void newTrades() throws Exception {
         service.deleteAll();
-        String file = "src/test/resources/trades2001.txt";
+        String file = "src/test/resources/trades2021.txt";
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), UTF_8));
         String currentLine;
@@ -114,7 +116,7 @@ public class LiveContentTest {
 
     @Test
     public void exportDailyPositions() throws Exception {
-        positionsService.deleteAll();
+        positionsService.deleteAllDaily();
         String file = "src/test/resources/dailyPositions131220.txt";
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), UTF_8));
@@ -145,7 +147,7 @@ public class LiveContentTest {
         transactionService.save(opening(LocalDate.of(2021, 1, 1), 600.7));
     }
 
-    double db(String value) {
+    public static double db(String value) {
         if (value.equals("-")) {
             return 0;
         } else {
@@ -153,16 +155,16 @@ public class LiveContentTest {
         }
     }
 
-    double dbP(String value) {
+    public static double dbP(String value) {
         return db(value.substring(0, value.length() - 1)) / 100;
     }
 
-    private LocalDateTime formatDate(String date, String time) {
-        String tradeDate = date + " 2020 " + time;
+    public static LocalDateTime formatDate(String date, String time) {
+        String tradeDate = date + " 2021 " + time;
         return LocalDateTime.parse(tradeDate, DateTimeFormatter.ofPattern("EEE dd MMM yyyy HH:mm"));
     }
 
-    private LocalDate formatDate(String date) {
+    public static LocalDate formatDate(String date) {
         return LocalDate.parse(date, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
     }
 }

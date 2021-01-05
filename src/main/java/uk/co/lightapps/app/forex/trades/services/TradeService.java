@@ -76,9 +76,13 @@ public class TradeService {
     }
 
     public List<Trade> getAll(LocalDate date) {
-        LocalDateTime start = LocalDateTime.of(date, LocalTime.MIN);
-        LocalDateTime end = LocalDateTime.of(date, LocalTime.MAX);
-        return getAll().stream().filter(e -> e.getDate().compareTo(start) >= 0 && e.getDate().compareTo(end) <= 1).collect(Collectors.toList());
+        return getAll(date, date);
+    }
+
+    public List<Trade> getAll(LocalDate start, LocalDate end) {
+        LocalDateTime startDate = LocalDateTime.of(start, LocalTime.MIN);
+        LocalDateTime endDate = LocalDateTime.of(end, LocalTime.MAX);
+        return getAll().stream().filter(e -> e.getDate().compareTo(startDate) >= 0 && e.getDate().compareTo(endDate) < 1).collect(Collectors.toList());
     }
 
     public void delete(String tradeId) {
