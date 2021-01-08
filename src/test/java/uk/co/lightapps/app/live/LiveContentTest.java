@@ -123,7 +123,7 @@ public class LiveContentTest {
         String currentLine;
         while ((currentLine = reader.readLine()) != null) {
             String[] split = currentLine.split("\t");
-            DailyPosition position = DailyPosition.logged(formatDate(split[0]), db(split[1]), db(split[2]), db(split[3]), db(split[4]), db(split[5]), db(split[6]), dbP(split[7]), db(split[8]), dbP(split[9]));
+            DailyPosition position = DailyPosition.logged(formatDate(split[0]), db(split[1]), db(split[2]), db(split[3]), db(split[4]), db(split[5]), db(split[6]), dbP(split[7]), db(split[8]), dbP(split[9]), 0);
             System.out.println(position);
 //            trade.setFees(db(split[15]));
 //            System.out.println(trade);

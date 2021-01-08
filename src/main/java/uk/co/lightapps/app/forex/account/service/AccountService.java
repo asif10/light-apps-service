@@ -2,19 +2,23 @@ package uk.co.lightapps.app.forex.account.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.co.lightapps.app.forex.Constant;
 import uk.co.lightapps.app.forex.account.domain.Account;
 import uk.co.lightapps.app.forex.account.domain.Figure;
 import uk.co.lightapps.app.forex.account.domain.TradeStats;
-import uk.co.lightapps.app.forex.positions.domain.WeeklyPosition;
 import uk.co.lightapps.app.forex.trades.domain.Trade;
 import uk.co.lightapps.app.forex.trades.services.TradeService;
 import uk.co.lightapps.app.forex.transactions.services.TransactionService;
 
-import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.time.DayOfWeek.*;
 
 /**
  * @author Asif Akhtar
@@ -82,10 +86,63 @@ public class AccountService {
 
         account.setTotalTrades(calculateTotalTrades());
         account.setTradesThisWeek(calculateWeeklyTrades());
+        account.setTradesThisMonth(calculateWeeklyTrades());
         account.setProfitThisWeek(calculateWeeklyProfit());
+        account.setReturnPerTrade(returnPerTrades(account));
+
+        account.setMaxTradesThisWeek(calculateMaxTrades());
+        account.setTradesPerDay(calculateTradesPerDay(account));
+
+        List<Trade> trades = tradeService.getAll();
+
+        account.setRrPerDay(calculateRrPerDay(account, trades));
+        account.setPipsPerDay(calculatePipsPerDay(account, trades));
+        account.setReturnPerDay(calculateReturnPerDay(account, trades));
 
         setOpenProfit(account);
         return account;
+    }
+
+    private double calculateReturnPerDay(Account account, List<Trade> trades) {
+        long days = calculateBusinessDaysPassed();
+        return account.getProfit().getValue() / days;
+    }
+
+    private double calculatePipsPerDay(Account account, List<Trade> trades) {
+        long days = calculateBusinessDaysPassed();
+        return account.getTotalTrades().getPips() / days;
+    }
+
+    private double calculateRrPerDay(Account account, List<Trade> trades) {
+        long days = calculateBusinessDaysPassed();
+        return account.getTotalTrades().getRr() / days;
+    }
+
+    private double calculateTradesPerDay(Account account) {
+        long days = calculateBusinessDaysPassed();
+        return account.getTotalTrades().getTrades() / days;
+
+    }
+
+    private long calculateBusinessDaysPassed() {
+        return calculateBusinessDays(LocalDate.of(2021, 1, 1), LocalDate.now()) + 1;
+    }
+
+    private static long calculateBusinessDays(LocalDate startDate, LocalDate endDate) {
+        Predicate<LocalDate> isWeekend = date -> date.getDayOfWeek() == SATURDAY || date.getDayOfWeek() == SUNDAY;
+
+        long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
+        return Stream.iterate(startDate, date -> date.plusDays(1)).limit(daysBetween).filter(isWeekend.negate()).count();
+    }
+
+    private double calculateMaxTrades() {
+        int day = LocalDate.now().getDayOfWeek().getValue();
+        return Math.min(day, 5) * Constant.TRADES_PER_DAY;
+    }
+
+    private Figure returnPerTrades(Account account) {
+        double returned = account.getProfit().getValue() / account.getTotalTrades().getTrades();
+        return new Figure(returned, returned / account.getCurrent());
     }
 
     private void setOpenProfit(Account account) {
@@ -102,6 +159,8 @@ public class AccountService {
         List<Trade> allTrades = tradeService.getAll();
         total.setTrades(allTrades.size());
         total.setWon(allTrades.stream().filter(e -> e.getProfit() > 0).count());
+        total.setRr(allTrades.stream().mapToDouble(Trade::getRr).sum());
+        total.setPips(allTrades.stream().mapToDouble(Trade::getPips).sum());
         total.setLost(total.getTrades() - total.getWon());
         total.setWinRatio(total.getWon() / total.getTrades());
         return total;
@@ -113,7 +172,7 @@ public class AccountService {
     }
 
     private LocalDateTime calculateStartOfWeek() {
-        LocalDateTime firstSunday = LocalDateTime.now().with(DayOfWeek.SUNDAY);
+        LocalDateTime firstSunday = LocalDateTime.now().with(SUNDAY);
         LocalDateTime startOfWeek;
         if (firstSunday.isAfter(LocalDateTime.now())) {
             startOfWeek = firstSunday.minusDays(7);

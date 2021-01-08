@@ -35,8 +35,9 @@ public class DailyPosition {
     private Figure position;
     private double trade;
     private double account;
+    private double perTrade;
 
-    public static DailyPosition logged(LocalDate date, double opening, double change, double profitLoss, double fees, double totalProfitLoss, double position, double positionP, double trades, double account) {
-        return new DailyPosition(UUID.randomUUID().toString(), date, opening, change, profitLoss, fees, totalProfitLoss, new Figure(position, positionP), trades, account);
+    public static DailyPosition logged(LocalDate date, double opening, double change, double profitLoss, double fees, double totalProfitLoss, double position, double positionP, double trades, double account, double perTrade) {
+        return new DailyPosition(UUID.randomUUID().toString(), date, opening, change, profitLoss, fees, totalProfitLoss, new Figure(position, positionP), trades, account, perTrade);
     }
 }

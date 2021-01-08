@@ -68,15 +68,21 @@ public class PositionsService {
         List<Trade> trades = tradeService.getAll(position.getDate());
 
         double fees = trades.stream().mapToDouble(Trade::getFees).sum();
+        double changed;
 
-        current.ifPresent(e -> position.setOpening(e.getOpening() + e.getChange() + e.getFees()));
+        if (current.isPresent()) {
+            position.setOpening(current.get().getOpening() + current.get().getChange() + current.get().getFees());
+            changed = account.getCurrent() - position.getOpening();
+        } else {
+            position.setOpening(account.getOpening());
+            changed = trades.stream().mapToDouble(Trade::getProfit).sum();
+        }
 
-        current.ifPresentOrElse(e -> position.setOpening(e.getOpening() + e.getChange() + e.getFees()), () -> position.setOpening(account.getOpening()));
-
-        position.setChange(account.getProfitThisWeek());
+        position.setChange(changed);
         position.setProfit(account.getProfit().getValue());
-        position.setTotalProfit(account.getProfitExclFees());
+        position.setTotalProfit(changed - fees);
         position.setFees(fees);
+        position.setPerTrade(position.getProfit() / account.getTotalTrades().getTrades());
         position.setPosition(new Figure(account.getCurrentPosition().getValue(), account.getCurrentPosition().getPercentage()));
         position.setTrade(account.getTradesAvailableCurrent());
         position.setAccount(account.getProfitThisWeek() / position.getOpening());
@@ -111,6 +117,7 @@ public class PositionsService {
         } else {
             position.setStart(account.getOpening());
         }
+
         position.setEnd(position.getStart() + profit + fees);
         position.setProfit(new Figure(profit, (profit / position.getStart())));
         position.setTotal(position.getProfit().getValue() + fees);
