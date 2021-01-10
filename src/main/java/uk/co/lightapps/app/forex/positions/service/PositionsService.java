@@ -103,7 +103,7 @@ public class PositionsService {
 
         Account account = accountService.getAccountInfo();
         LocalDate start = position.getDate();
-        List<Trade> trades = tradeService.getAll(start, position.getDate().plusDays(6));
+        List<Trade> trades = tradeService.getAll(start.minusDays(5), start);
         long won = trades.stream().filter(e -> e.getProfit() > 0).count();
 
         double fees = trades.stream().mapToDouble(Trade::getFees).sum();
@@ -127,11 +127,18 @@ public class PositionsService {
         position.setRr(rr);
         position.setRatio(ratio);
         position.setRoi(roi);
+        position.setFees(fees);
         calculateTradesAvailable(position);
         position.setInvested(invested);
-
+        position.setTotalPosition(account.getCurrentPosition().getValue());
+        position.setCurrentProfit(account.getProfit().getValue());
+        calculateWeeklyTradesAvailable(position);
         save(position);
         return position;
+    }
+
+    private void calculateWeeklyTradesAvailable(WeeklyPosition position) {
+        position.setTradesAvailablePerWeek(Math.abs(position.getEnd() / position.getCurrentProfit()));
     }
 
     private void calculateTradesAvailable(WeeklyPosition position) {
@@ -143,6 +150,7 @@ public class PositionsService {
         }
         double returnPerTrade = (position.getEnd() - startOfWeek) / trades.size();
         position.setTradesAvailable(Math.abs(position.getEnd() / returnPerTrade));
+        position.setReturnPerTrade(returnPerTrade);
     }
 
     private Optional<WeeklyPosition> getFirstWeek() {

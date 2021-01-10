@@ -33,4 +33,8 @@ public class Account {
     private double returnPerDay;
     private double pipsPerDay;
     private double rrPerDay;
+    private double rrPerWeek;
+    private double tradesPerWeek;
+    private double returnPerWeek;
+    private double pipsPerWeek;
 }

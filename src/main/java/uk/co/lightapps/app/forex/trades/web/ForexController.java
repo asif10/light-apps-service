@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import uk.co.lightapps.app.forex.positions.domain.DailyPosition;
+import uk.co.lightapps.app.forex.positions.domain.WeeklyPosition;
 import uk.co.lightapps.app.forex.positions.service.PositionsService;
 import uk.co.lightapps.app.forex.strategies.domain.Strategies;
 import uk.co.lightapps.app.forex.strategies.services.StrategiesService;
@@ -69,6 +70,13 @@ public class ForexController {
     @GetMapping(value = "/positions/daily")
     public List<DailyPosition> getDailyPositions() {
         List<DailyPosition> positions = positionsService.getDailyPositions();
+        Collections.reverse(positions);
+        return positions;
+    }
+
+    @GetMapping(value = "/positions/weekly")
+    public List<WeeklyPosition> getWeeklyPositions() {
+        List<WeeklyPosition> positions = positionsService.getWeeklyPositions();
         Collections.reverse(positions);
         return positions;
     }

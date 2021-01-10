@@ -29,6 +29,7 @@ public class WeeklyPosition {
     private double fees;
     private double total;
     private double tradesAvailable;
+    private double tradesAvailablePerWeek;
     private long trades;
     private long won;
     private long lost;
@@ -38,6 +39,7 @@ public class WeeklyPosition {
     private double roi;
     private double returnPerTrade;
     private double totalPosition;
+    private double currentProfit;
 
     public void calculate() {
         double profit = end - start;

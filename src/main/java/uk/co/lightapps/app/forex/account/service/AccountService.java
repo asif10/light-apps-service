@@ -93,11 +93,16 @@ public class AccountService {
         account.setMaxTradesThisWeek(calculateMaxTrades());
         account.setTradesPerDay(calculateTradesPerDay(account));
 
+        account.setTradesPerWeek(calculateTradesPerWeek(account));
+
         List<Trade> trades = tradeService.getAll();
 
         account.setRrPerDay(calculateRrPerDay(account, trades));
+        account.setRrPerWeek(calculateRrPerWeek(account, trades));
         account.setPipsPerDay(calculatePipsPerDay(account, trades));
+        account.setPipsPerWeek(calculatePipsPerWeek(account, trades));
         account.setReturnPerDay(calculateReturnPerDay(account, trades));
+        account.setReturnPerWeek(calculateReturnPerWeek(account, trades));
 
         setOpenProfit(account);
         return account;
@@ -108,9 +113,19 @@ public class AccountService {
         return account.getProfit().getValue() / days;
     }
 
+    private double calculateReturnPerWeek(Account account, List<Trade> trades) {
+        long weeks = calculateWeeksPassed();
+        return account.getProfit().getValue() / weeks;
+    }
+
     private double calculatePipsPerDay(Account account, List<Trade> trades) {
         long days = calculateBusinessDaysPassed();
         return account.getTotalTrades().getPips() / days;
+    }
+
+    private double calculatePipsPerWeek(Account account, List<Trade> trades) {
+        long weeks = calculateWeeksPassed();
+        return account.getTotalTrades().getPips() / weeks;
     }
 
     private double calculateRrPerDay(Account account, List<Trade> trades) {
@@ -118,10 +133,24 @@ public class AccountService {
         return account.getTotalTrades().getRr() / days;
     }
 
+    private double calculateRrPerWeek(Account account, List<Trade> trades) {
+        long weeks = calculateWeeksPassed();
+        return account.getTotalTrades().getRr() / weeks;
+    }
+
     private double calculateTradesPerDay(Account account) {
         long days = calculateBusinessDaysPassed();
         return account.getTotalTrades().getTrades() / days;
+    }
 
+    private double calculateTradesPerWeek(Account account) {
+        long weeks = calculateWeeksPassed();
+        return account.getTotalTrades().getTrades() / weeks;
+    }
+
+    private long calculateWeeksPassed() {
+        long days = calculateBusinessDaysPassed();
+        return days / 5;
     }
 
     private long calculateBusinessDaysPassed() {
