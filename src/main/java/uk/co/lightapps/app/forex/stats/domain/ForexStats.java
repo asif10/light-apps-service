@@ -13,12 +13,7 @@ import uk.co.lightapps.app.forex.account.domain.Figure;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ForexStats {
-    private long trades;
-    private long pips;
-    private long tradingDays;
-    private long daysPassed;
-    private long daysTraded;
-    private long daysNotTraded;
-    private double timesPerDay;
-    private Figure manuallyClosedTrades;
+    private Figure stopLosses;
+    private Figure takeProfit;
+    private Figure manual;
 }

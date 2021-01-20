@@ -15,6 +15,7 @@ public class Account {
     private double opening;
     private double current;
     private double maxTradesThisWeek;
+    private Figure maxTrades;
     private Figure profit;
     private Figure openProfit;
     private Figure openProfitIncFees;
@@ -26,7 +27,6 @@ public class Account {
     private TradeStats tradesThisWeek;
     private TradeStats tradesThisMonth;
     private double tradesAvailableStart;
-    private double tradesAvailableCurrent;
     private double profitThisWeek;
     private Figure returnPerTrade;
     private double tradesPerDay;
@@ -37,4 +37,6 @@ public class Account {
     private double tradesPerWeek;
     private double returnPerWeek;
     private double pipsPerWeek;
+    private double averageRrPerProfit;
+    private double averageRrPerLoss;
 }

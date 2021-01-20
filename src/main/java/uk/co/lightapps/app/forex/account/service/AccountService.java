@@ -6,6 +6,8 @@ import uk.co.lightapps.app.forex.Constant;
 import uk.co.lightapps.app.forex.account.domain.Account;
 import uk.co.lightapps.app.forex.account.domain.Figure;
 import uk.co.lightapps.app.forex.account.domain.TradeStats;
+import uk.co.lightapps.app.forex.decay.domain.Decay;
+import uk.co.lightapps.app.forex.decay.services.DecayService;
 import uk.co.lightapps.app.forex.trades.domain.Trade;
 import uk.co.lightapps.app.forex.trades.services.TradeService;
 import uk.co.lightapps.app.forex.transactions.services.TransactionService;
@@ -80,17 +82,17 @@ public class AccountService {
         account.setFees(sumTradesFeesValue());
         account.setCurrentPosition(calculateCurrentPosition());
         account.setStartPosition(calculateStartPosition());
-        account.setTradesAvailableCurrent(calculateAvailableTrades());
         account.setTradesAvailableStart(calculateAvailableTradesOnStart());
         account.setProfitExclFees(account.getProfit().getValue() - sumTradesFeesValue());
 
         account.setTotalTrades(calculateTotalTrades());
         account.setTradesThisWeek(calculateWeeklyTrades());
-        account.setTradesThisMonth(calculateWeeklyTrades());
+        account.setTradesThisMonth(calculateMonthlyTrades());
         account.setProfitThisWeek(calculateWeeklyProfit());
         account.setReturnPerTrade(returnPerTrades(account));
 
-        account.setMaxTradesThisWeek(calculateMaxTrades());
+        account.setMaxTradesThisWeek(calculateMaxTradesThisWeek());
+        calculateMaxTrades(account);
         account.setTradesPerDay(calculateTradesPerDay(account));
 
         account.setTradesPerWeek(calculateTradesPerWeek(account));
@@ -104,8 +106,34 @@ public class AccountService {
         account.setReturnPerDay(calculateReturnPerDay(account, trades));
         account.setReturnPerWeek(calculateReturnPerWeek(account, trades));
 
+        calculateRRPerProfitLoss(account, trades);
+
         setOpenProfit(account);
         return account;
+    }
+
+    private class TradeData {
+        int profit;
+        int loss;
+        double profitRR;
+        double lossRR;
+    }
+
+    private void calculateRRPerProfitLoss(Account account, List<Trade> trades) {
+        TradeData tradeData = new TradeData();
+
+        trades.forEach(trade -> {
+            if (trade.getProfit() > 0) {
+                tradeData.profit += 1;
+                tradeData.profitRR += trade.getRr();
+            } else if (trade.getProfit() < 0) {
+                tradeData.loss += 1;
+                tradeData.lossRR += trade.getRr();
+            }
+        });
+
+        account.setAverageRrPerLoss(tradeData.lossRR / tradeData.loss);
+        account.setAverageRrPerProfit(tradeData.profitRR / tradeData.profit);
     }
 
     private double calculateReturnPerDay(Account account, List<Trade> trades) {
@@ -164,9 +192,15 @@ public class AccountService {
         return Stream.iterate(startDate, date -> date.plusDays(1)).limit(daysBetween).filter(isWeekend.negate()).count();
     }
 
-    private double calculateMaxTrades() {
+    private double calculateMaxTradesThisWeek() {
         int day = LocalDate.now().getDayOfWeek().getValue();
         return Math.min(day, 5) * Constant.TRADES_PER_DAY;
+    }
+
+    private void calculateMaxTrades(Account account) {
+        long days = calculateBusinessDaysPassed();
+        long total = days * Constant.TRADES_PER_DAY;
+        account.setMaxTrades(new Figure(total, (double) account.getTotalTrades().getTrades() / total));
     }
 
     private Figure returnPerTrades(Account account) {
@@ -225,6 +259,19 @@ public class AccountService {
         return total;
     }
 
+    private TradeStats calculateMonthlyTrades() {
+        LocalDateTime startOfWeek = LocalDateTime.now().withDayOfMonth(1);
+        LocalDateTime endOfWeek = startOfWeek.withDayOfMonth(startOfWeek.toLocalDate().lengthOfMonth());
+
+        TradeStats total = new TradeStats();
+        List<Trade> allTrades = getTrades(startOfWeek, endOfWeek);
+        total.setTrades(allTrades.size());
+        total.setWon(allTrades.stream().filter(e -> e.getProfit() > 0).count());
+        total.setLost(total.getTrades() - total.getWon());
+        total.setWinRatio(total.getWon() / total.getTrades());
+        return total;
+    }
+
     private double calculateWeeklyProfit() {
         LocalDateTime startOfWeek = calculateStartOfWeek();
         LocalDateTime endOfWeek = startOfWeek.plusDays(5);
@@ -243,10 +290,5 @@ public class AccountService {
         return 33968;
     }
 
-    private double calculateAvailableTrades() {
-        double profit = calculateProfit().getValue();
-        List<Trade> trades = tradeService.getAll();
-        double returnPerTrade = profit / trades.size();
-        return Math.abs(calculateCurrentBalance() / returnPerTrade);
-    }
+
 }

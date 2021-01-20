@@ -74,12 +74,6 @@ public class AccountServiceTest {
     }
 
     @Test
-    public void calculateAvailableTrades() {
-        Account account = accountService.getAccountInfo();
-        assertThat(round(account.getTradesAvailableCurrent()), is(35.47));
-    }
-
-    @Test
     public void calculateReturn() {
         Account account = accountService.getAccountInfo();
         assertThat(round(account.getProfit().getValue()), is(10.30));

@@ -70,7 +70,7 @@ public class PositionsTest {
         importTrade("Mon 04 Jan\t09:33\tGBPUSD\tSHORT\t304\t344.09\t1.74%\t 0.01 \t6.00\t4.89\t-1.11\t-18.5%\t-0.3%\t19\t-1\t-1.0\t-\t-");
         DailyPosition dailyPosition = positionsService.logDaily(LocalDate.of(2021, 1, 4));
         assertThat(rounded(dailyPosition.getOpening()), is(600.7));
-        assertThat(rounded(dailyPosition.getChange()), is(-1.11));
+        assertThat(rounded(dailyPosition.getDifference()), is(-1.11));
         assertThat(rounded(dailyPosition.getProfit()), is(-1.11));
         assertThat(rounded(dailyPosition.getTotalProfit()), is(-1.11));
 
@@ -89,7 +89,7 @@ public class PositionsTest {
 
         DailyPosition dailyPosition = positionsService.logDaily(LocalDate.of(2020, 12, 18));
         assertThat(rounded(dailyPosition.getOpening()), is(356.26));
-        assertThat(rounded(dailyPosition.getChange()), is(-3.51));
+        assertThat(rounded(dailyPosition.getDifference()), is(-3.51));
         assertThat(rounded(dailyPosition.getProfit()), is(13.26));
         assertThat(rounded(dailyPosition.getTotalProfit()), is(14.17));
 

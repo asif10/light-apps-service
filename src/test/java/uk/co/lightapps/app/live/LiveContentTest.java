@@ -113,27 +113,27 @@ public class LiveContentTest {
         }
     }
 
-    @Test
-    public void exportDailyPositions() throws Exception {
-        positionsService.deleteAllDaily();
-        String file = "src/test/resources/dailyPositions131220.txt";
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), UTF_8));
-        String currentLine;
-        while ((currentLine = reader.readLine()) != null) {
-            String[] split = currentLine.split("\t");
-            DailyPosition position = DailyPosition.logged(formatDate(split[0]), db(split[1]), db(split[2]), db(split[3]), db(split[4]), db(split[5]), db(split[6]), dbP(split[7]), db(split[8]), dbP(split[9]), 0);
-            System.out.println(position);
-//            trade.setFees(db(split[15]));
-//            System.out.println(trade);
-//            if (split[16].trim().length() == 0) {
-//                System.out.println("OPEN");
-//            } else {
-//                System.out.println("CLOSED");
-            positionsService.add(position);
-//            }
-        }
-    }
+//    @Test
+//    public void exportDailyPositions() throws Exception {
+//        positionsService.deleteAllDaily();
+//        String file = "src/test/resources/dailyPositions131220.txt";
+//
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), UTF_8));
+//        String currentLine;
+//        while ((currentLine = reader.readLine()) != null) {
+//            String[] split = currentLine.split("\t");
+//            DailyPosition position = DailyPosition.logged(formatDate(split[0]), db(split[1]), db(split[2]), db(split[3]), db(split[4]), db(split[5]), db(split[6]), dbP(split[7]), db(split[8]), dbP(split[9]), 0);
+//            System.out.println(position);
+////            trade.setFees(db(split[15]));
+////            System.out.println(trade);
+////            if (split[16].trim().length() == 0) {
+////                System.out.println("OPEN");
+////            } else {
+////                System.out.println("CLOSED");
+//            positionsService.add(position);
+////            }
+//        }
+//    }
 
     @Test
     public void addTransactions() throws Exception {

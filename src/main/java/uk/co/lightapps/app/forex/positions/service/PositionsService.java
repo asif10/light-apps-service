@@ -5,6 +5,9 @@ import org.springframework.stereotype.Service;
 import uk.co.lightapps.app.forex.account.domain.Account;
 import uk.co.lightapps.app.forex.account.domain.Figure;
 import uk.co.lightapps.app.forex.account.service.AccountService;
+import uk.co.lightapps.app.forex.decay.domain.Decay;
+import uk.co.lightapps.app.forex.decay.domain.DecayOptions;
+import uk.co.lightapps.app.forex.decay.services.DecayService;
 import uk.co.lightapps.app.forex.positions.domain.DailyPosition;
 import uk.co.lightapps.app.forex.positions.domain.WeeklyPosition;
 import uk.co.lightapps.app.forex.positions.repository.DailyPositionsRepository;
@@ -14,7 +17,6 @@ import uk.co.lightapps.app.forex.trades.services.TradeService;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -27,6 +29,7 @@ public class PositionsService {
     private final DailyPositionsRepository dailyRepository;
     private final WeeklyPositionsRepository weeklyRepository;
     private final AccountService accountService;
+    private final DecayService decayService;
     private final TradeService tradeService;
 
     public void add(DailyPosition position) {
@@ -65,26 +68,33 @@ public class PositionsService {
         }
 
         Account account = accountService.getAccountInfo();
+        DecayOptions options = DecayOptions.builder()
+                .account(account)
+                .trades(tradeService.getAll())
+                .build();
+        Decay decay = decayService.calculateDecay(options);
+
         List<Trade> trades = tradeService.getAll(position.getDate());
 
         double fees = trades.stream().mapToDouble(Trade::getFees).sum();
         double changed;
 
         if (current.isPresent()) {
-            position.setOpening(current.get().getOpening() + current.get().getChange() + current.get().getFees());
-            changed = account.getCurrent() - position.getOpening();
+            position.setOpening(current.get().getOpening() + current.get().getDifference() + current.get().getFees());
+            changed = account.getCurrent() - position.getOpening() - fees;
         } else {
             position.setOpening(account.getOpening());
             changed = trades.stream().mapToDouble(Trade::getProfit).sum();
         }
 
-        position.setChange(changed);
+        position.setDifference(changed);
+        position.setTotalDifference(changed + fees);
         position.setProfit(account.getProfit().getValue());
-        position.setTotalProfit(changed - fees);
+        position.setTotalProfit(account.getProfit().getValue() + fees);
         position.setFees(fees);
         position.setPerTrade(position.getProfit() / account.getTotalTrades().getTrades());
         position.setPosition(new Figure(account.getCurrentPosition().getValue(), account.getCurrentPosition().getPercentage()));
-        position.setTrade(account.getTradesAvailableCurrent());
+        position.setTrade(decay.getTradesAvailable());
         position.setAccount(account.getProfitThisWeek() / position.getOpening());
 
         save(position);
@@ -132,13 +142,17 @@ public class PositionsService {
         position.setInvested(invested);
         position.setTotalPosition(account.getCurrentPosition().getValue());
         position.setCurrentProfit(account.getProfit().getValue());
-        calculateWeeklyTradesAvailable(position);
+        calculateWeeklyTradesAvailable(account, position);
         save(position);
         return position;
     }
 
-    private void calculateWeeklyTradesAvailable(WeeklyPosition position) {
-        position.setTradesAvailablePerWeek(Math.abs(position.getEnd() / position.getCurrentProfit()));
+    private void calculateWeeklyTradesAvailable(Account account, WeeklyPosition position) {
+        double currentPosition = account.getCurrent();
+        List<WeeklyPosition> weeklyPositions = getWeeklyPositions();
+        double returns = weeklyPositions.stream().mapToDouble(e -> e.getProfit().getValue()).sum() + position.getTotal();
+        double returnsPerWeek = returns / (weeklyPositions.size()+1);
+        position.setTradesAvailablePerWeek(Math.abs(currentPosition / returnsPerWeek));
     }
 
     private void calculateTradesAvailable(WeeklyPosition position) {
@@ -185,5 +199,11 @@ public class PositionsService {
         } else {
             return Optional.empty();
         }
+    }
+
+    public void deleteWeek(LocalDate week) {
+        List<WeeklyPosition> all = getWeeklyPositions();
+        WeeklyPosition matched = all.stream().filter(e -> e.getDate().equals(week)).findFirst().orElseThrow();
+        weeklyRepository.delete(matched);
     }
 }

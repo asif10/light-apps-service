@@ -30,7 +30,7 @@ public class LivePositionsTest {
 
     @Test
     public void check_weekly_position() throws Exception {
-        positionsService.deleteAllWeekly();
+//        positionsService.deleteAllWeekly();
         WeeklyPosition saved = positionsService.logWeekly(LocalDate.of(2021, 1, 8));
 
         assertThat(rounded(saved.getStart()), is(600.70));
@@ -55,5 +55,35 @@ public class LivePositionsTest {
         assertThat(saved.getPositionId(), notNullValue());
 
         assertThat(positionsService.getWeeklyPositions().size(), is(1));
+    }
+
+    @Test
+    public void test_current_week() throws Exception {
+        LocalDate week = LocalDate.of(2021, 1, 15);
+        positionsService.deleteWeek(week);
+        WeeklyPosition saved = positionsService.logWeekly(week);
+//
+//        assertThat(rounded(saved.getStart()), is(600.70));
+//        assertThat(rounded(saved.getEnd()), is(598.83));
+//        assertThat(rounded(saved.getProfit().getValue()), is(-1.87));
+//        assertThat(rounded(saved.getProfit().getPercentage()) * 100, is(-0.31));
+//        assertThat(rounded(saved.getFees()), is(-0.01));
+//        assertThat(rounded(saved.getTotal()), is(-1.87));
+//        assertThat(saved.getTrades(), is(13L));
+//        assertThat(saved.getWon(), is(4L));
+//        assertThat(saved.getLost(), is(9L));
+//        assertThat(rounded(saved.getRatio()), is(0.3077));
+//        assertThat(rounded(saved.getRr()), is(-3.15));
+//        assertThat(rounded(saved.getInvested()), is(78.00));
+//        assertThat(rounded(saved.getRoi()), is(-0.0238));
+//        assertThat(rounded(saved.getReturnPerTrade()), is(-0.1438));
+//        assertThat(rounded(saved.getTotalPosition()), is(-306.98));
+//        assertThat(rounded2dp(saved.getCurrentProfit()), is(-1.87));
+//        assertThat(rounded2dp(saved.getTradesAvailable()), is(4162.99));
+        assertThat(rounded2dp(saved.getTradesAvailablePerWeek()), is(378.19));
+//
+//        assertThat(saved.getPositionId(), notNullValue());
+//
+//        assertThat(positionsService.getWeeklyPositions().size(), is(1));
     }
 }

@@ -5,13 +5,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import uk.co.lightapps.app.forex.account.service.AccountService;
+import uk.co.lightapps.app.forex.decay.domain.Decay;
+import uk.co.lightapps.app.forex.decay.domain.DecayOptions;
+import uk.co.lightapps.app.forex.decay.services.DecayService;
 import uk.co.lightapps.app.forex.positions.domain.DailyPosition;
 import uk.co.lightapps.app.forex.positions.domain.WeeklyPosition;
 import uk.co.lightapps.app.forex.positions.service.PositionsService;
 import uk.co.lightapps.app.forex.strategies.domain.Strategies;
 import uk.co.lightapps.app.forex.strategies.services.StrategiesService;
-import uk.co.lightapps.app.forex.trades.services.TradeService;
 import uk.co.lightapps.app.forex.trades.domain.Trade;
+import uk.co.lightapps.app.forex.trades.services.TradeService;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -28,6 +32,8 @@ import java.util.List;
 public class ForexController {
     private final TradeService service;
     private final PositionsService positionsService;
+    private final AccountService accountService;
+    private final DecayService decayService;
     private final StrategiesService strategiesService;
 
     @GetMapping(value = "/trades")
@@ -67,6 +73,11 @@ public class ForexController {
         return positionsService.logDaily(LocalDate.now());
     }
 
+    @PostMapping(value = "/positions/weekly/save")
+    public WeeklyPosition saveWeeklyPosition() {
+        return positionsService.logWeekly(LocalDate.now());
+    }
+
     @GetMapping(value = "/positions/daily")
     public List<DailyPosition> getDailyPositions() {
         List<DailyPosition> positions = positionsService.getDailyPositions();
@@ -76,9 +87,17 @@ public class ForexController {
 
     @GetMapping(value = "/positions/weekly")
     public List<WeeklyPosition> getWeeklyPositions() {
-        List<WeeklyPosition> positions = positionsService.getWeeklyPositions();
-        Collections.reverse(positions);
-        return positions;
+        return positionsService.getWeeklyPositions();
+    }
+
+    @GetMapping(value = "/decay")
+    public Decay getDecay() {
+        DecayOptions options = DecayOptions.builder()
+                .account(accountService.getAccountInfo())
+                .weeklyPositions(positionsService.getWeeklyPositions())
+                .trades(service.getAll())
+                .build();
+        return decayService.calculateDecay(options);
     }
 
     @GetMapping(value = "/strategies/all")
