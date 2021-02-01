@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.StreamUtils;
 import uk.co.lightapps.app.forex.positions.domain.DailyPosition;
 import uk.co.lightapps.app.forex.positions.service.PositionsService;
 import uk.co.lightapps.app.forex.trades.domain.Pair;
@@ -83,6 +84,9 @@ public class LiveContentTest {
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), UTF_8));
         String currentLine;
         while ((currentLine = reader.readLine()) != null) {
+            if (currentLine.trim().length() == 0) {
+                continue;
+            }
             String[] split = currentLine.split("\t");
 //            Thu 24 Dec	17:41	USDCHF	LONG	301	600.00	1.00%	 0.01 	6.00	5.67	-0.33	-5.5%	-0.1%	0	-1	2.2	-	-
 

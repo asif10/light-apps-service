@@ -8,9 +8,9 @@ import lombok.Data;
  */
 @Data
 public class TradeStats {
-    private double trades;
-    private double won;
-    private double lost;
+    private long trades;
+    private long won;
+    private long lost;
     private double winRatio;
     private double rr;
     private double pips;

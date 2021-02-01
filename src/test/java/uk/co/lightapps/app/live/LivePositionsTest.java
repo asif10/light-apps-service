@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.co.lightapps.app.forex.positions.domain.MonthlyPosition;
 import uk.co.lightapps.app.forex.positions.domain.WeeklyPosition;
 import uk.co.lightapps.app.forex.positions.service.PositionsService;
 
@@ -58,6 +59,12 @@ public class LivePositionsTest {
     }
 
     @Test
+    public void log_today() throws Exception {
+        LocalDate week = LocalDate.of(2021, 1, 28);
+        positionsService.logDaily(week);
+    }
+
+    @Test
     public void test_current_week() throws Exception {
         LocalDate week = LocalDate.of(2021, 1, 15);
         positionsService.deleteWeek(week);
@@ -85,5 +92,37 @@ public class LivePositionsTest {
 //        assertThat(saved.getPositionId(), notNullValue());
 //
 //        assertThat(positionsService.getWeeklyPositions().size(), is(1));
+    }
+
+    @Test
+    public void test_current_month() throws Exception {
+        LocalDate week = LocalDate.of(2021, 1, 1);
+//        positionsService.deleteWeek(week);
+        MonthlyPosition saved = positionsService.logMonthly(week);
+        assertThat(saved, is(notNullValue()));
+        assertThat(rounded2dp(saved.getStart()), is(600.70));
+        assertThat(rounded2dp(saved.getEnd()), is(594.14));
+        assertThat(rounded2dp(saved.getProfit().getValue()), is(-6.56));
+        assertThat(rounded2dp(saved.getFees()), is(-0.28));
+        assertThat(rounded2dp(saved.getProfit().getPercentage() * 100), is(-1.09));
+
+        assertThat(saved.getStats().getTrades(), is(63L));
+        assertThat(saved.getStats().getWon(), is(30L));
+        assertThat(saved.getStats().getLost(), is(33L));
+        assertThat(rounded2dp(saved.getStats().getPips()), is(-397.0));
+        assertThat(rounded2dp(saved.getStats().getWinRatio() * 100), is(47.62));
+        assertThat(rounded2dp(saved.getInvested()), is(384.00));
+        assertThat(rounded2dp(saved.getRoi() * 100), is(-1.71));
+        assertThat(rounded2dp(saved.getTradesPerDay()), is(3.15));
+        assertThat(rounded2dp(saved.getTradesPerWeek()), is(15.75));
+
+        assertThat(rounded2dp(saved.getWinsSplit().getTotalReturn()), is(11.19));
+        assertThat(rounded2dp(saved.getWinsSplit().getReturnPerTrade()), is(0.37));
+        assertThat(rounded2dp(saved.getWinsSplit().getPercentage() * 100), is(6.22));
+
+        assertThat(rounded2dp(saved.getLossesSplit().getTotalReturn()), is(-17.47));
+        assertThat(rounded2dp(saved.getLossesSplit().getReturnPerTrade()), is(-0.53));
+        assertThat(rounded2dp(saved.getLossesSplit().getPercentage() * 100), is(-8.82));
+
     }
 }

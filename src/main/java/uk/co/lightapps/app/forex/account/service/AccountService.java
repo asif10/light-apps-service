@@ -112,6 +112,45 @@ public class AccountService {
         return account;
     }
 
+    public Account getAccountInfo(LocalDate date) {
+        Account account = getAccountInfo();
+//        account.setDeposited(calculateDepositAmount());
+//        account.setProfit(calculateProfit());
+//        account.setOpening(calculateStartBalance());
+//        account.setCurrent(calculateCurrentBalance());
+//        account.setFees(sumTradesFeesValue());
+//        account.setCurrentPosition(calculateCurrentPosition());
+//        account.setStartPosition(calculateStartPosition());
+//        account.setTradesAvailableStart(calculateAvailableTradesOnStart());
+//        account.setProfitExclFees(account.getProfit().getValue() - sumTradesFeesValue());
+
+        account.setTotalTrades(calculateTotalTrades(date));
+        account.setTradesThisWeek(calculateWeeklyTrades());
+        account.setTradesThisMonth(calculateMonthlyTrades());
+        account.setProfitThisWeek(calculateWeeklyProfit());
+        account.setReturnPerTrade(returnPerTrades(account));
+
+        account.setMaxTradesThisWeek(calculateMaxTradesThisWeek());
+        calculateMaxTrades(account);
+        account.setTradesPerDay(calculateTradesPerDay(account, date));
+
+        account.setTradesPerWeek(calculateTradesPerWeek(account));
+
+//        List<Trade> trades = tradeService.getAll();
+//
+//        account.setRrPerDay(calculateRrPerDay(account, trades));
+//        account.setRrPerWeek(calculateRrPerWeek(account, trades));
+//        account.setPipsPerDay(calculatePipsPerDay(account, trades));
+//        account.setPipsPerWeek(calculatePipsPerWeek(account, trades));
+//        account.setReturnPerDay(calculateReturnPerDay(account, trades));
+//        account.setReturnPerWeek(calculateReturnPerWeek(account, trades));
+//
+//        calculateRRPerProfitLoss(account, trades);
+//
+//        setOpenProfit(account);
+        return account;
+    }
+
     private class TradeData {
         int profit;
         int loss;
@@ -168,12 +207,17 @@ public class AccountService {
 
     private double calculateTradesPerDay(Account account) {
         long days = calculateBusinessDaysPassed();
-        return account.getTotalTrades().getTrades() / days;
+        return (double) account.getTotalTrades().getTrades() / days;
+    }
+
+    private double calculateTradesPerDay(Account account, LocalDate date) {
+        long days = calculateBusinessDays(date, endOfMonth(date));
+        return (double) account.getTotalTrades().getTrades() / days;
     }
 
     private double calculateTradesPerWeek(Account account) {
         long weeks = calculateWeeksPassed();
-        return account.getTotalTrades().getTrades() / weeks;
+        return (double) account.getTotalTrades().getTrades() / weeks;
     }
 
     private long calculateWeeksPassed() {
@@ -182,14 +226,18 @@ public class AccountService {
     }
 
     private long calculateBusinessDaysPassed() {
-        return calculateBusinessDays(LocalDate.of(2021, 1, 1), LocalDate.now()) + 1;
+        return calculateBusinessDays(LocalDate.of(2021, 1, 1), LocalDate.now());
     }
 
-    private static long calculateBusinessDays(LocalDate startDate, LocalDate endDate) {
+    public static long calculateBusinessDays(LocalDate startDate, LocalDate endDate) {
         Predicate<LocalDate> isWeekend = date -> date.getDayOfWeek() == SATURDAY || date.getDayOfWeek() == SUNDAY;
 
         long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
-        return Stream.iterate(startDate, date -> date.plusDays(1)).limit(daysBetween).filter(isWeekend.negate()).count();
+        long days = Stream.iterate(startDate, date -> date.plusDays(1)).limit(daysBetween).filter(isWeekend.negate()).count();
+        if (startDate.getMonthValue() == 1) {
+            days -= 1;
+        }
+        return days;
     }
 
     private double calculateMaxTradesThisWeek() {
@@ -218,14 +266,25 @@ public class AccountService {
     }
 
     private TradeStats calculateTotalTrades() {
+        return calculateTotalTrades(tradeService.getAll());
+    }
+
+    private TradeStats calculateTotalTrades(LocalDate date) {
+        return calculateTotalTrades(tradeService.getAll(date, endOfMonth(date)));
+    }
+
+    private LocalDate endOfMonth(LocalDate date) {
+        return date.plusMonths(1).minusDays(1);
+    }
+
+    private TradeStats calculateTotalTrades(List<Trade> allTrades) {
         TradeStats total = new TradeStats();
-        List<Trade> allTrades = tradeService.getAll();
         total.setTrades(allTrades.size());
         total.setWon(allTrades.stream().filter(e -> e.getProfit() > 0).count());
         total.setRr(allTrades.stream().mapToDouble(Trade::getRr).sum());
         total.setPips(allTrades.stream().mapToDouble(Trade::getPips).sum());
         total.setLost(total.getTrades() - total.getWon());
-        total.setWinRatio(total.getWon() / total.getTrades());
+        total.setWinRatio((double) total.getWon() / total.getTrades());
         return total;
     }
 
@@ -255,7 +314,9 @@ public class AccountService {
         total.setTrades(allTrades.size());
         total.setWon(allTrades.stream().filter(e -> e.getProfit() > 0).count());
         total.setLost(total.getTrades() - total.getWon());
-        total.setWinRatio(total.getWon() / total.getTrades());
+        if (total.getWon() > 0) {
+            total.setWinRatio((double) total.getWon() / total.getTrades());
+        }
         return total;
     }
 
@@ -268,7 +329,7 @@ public class AccountService {
         total.setTrades(allTrades.size());
         total.setWon(allTrades.stream().filter(e -> e.getProfit() > 0).count());
         total.setLost(total.getTrades() - total.getWon());
-        total.setWinRatio(total.getWon() / total.getTrades());
+        total.setWinRatio((double) total.getWon() / total.getTrades());
         return total;
     }
 

@@ -15,6 +15,7 @@ import uk.co.lightapps.app.forex.positions.service.PositionsService;
 import uk.co.lightapps.app.forex.strategies.domain.Strategies;
 import uk.co.lightapps.app.forex.strategies.services.StrategiesService;
 import uk.co.lightapps.app.forex.trades.domain.Trade;
+import uk.co.lightapps.app.forex.trades.domain.TradesGroup;
 import uk.co.lightapps.app.forex.trades.services.TradeService;
 
 import java.time.LocalDate;
@@ -41,6 +42,11 @@ public class ForexController {
         List<Trade> trades = service.getAll();
         Collections.reverse(trades);
         return trades;
+    }
+
+    @GetMapping(value = "/trades/grouped/weekly")
+    public List<TradesGroup> tradesGroup() {
+        return service.getTradesGrouped();
     }
 
     @GetMapping(value = "/trades/open")
@@ -87,7 +93,9 @@ public class ForexController {
 
     @GetMapping(value = "/positions/weekly")
     public List<WeeklyPosition> getWeeklyPositions() {
-        return positionsService.getWeeklyPositions();
+        List<WeeklyPosition> weeklyPositions = positionsService.getWeeklyPositions();
+        Collections.reverse(weeklyPositions);
+        return weeklyPositions;
     }
 
     @GetMapping(value = "/decay")
