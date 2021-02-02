@@ -10,6 +10,7 @@ import uk.co.lightapps.app.forex.decay.domain.Decay;
 import uk.co.lightapps.app.forex.decay.domain.DecayOptions;
 import uk.co.lightapps.app.forex.decay.services.DecayService;
 import uk.co.lightapps.app.forex.positions.domain.DailyPosition;
+import uk.co.lightapps.app.forex.positions.domain.MonthlyPosition;
 import uk.co.lightapps.app.forex.positions.domain.WeeklyPosition;
 import uk.co.lightapps.app.forex.positions.service.PositionsService;
 import uk.co.lightapps.app.forex.strategies.domain.Strategies;
@@ -96,6 +97,13 @@ public class ForexController {
         List<WeeklyPosition> weeklyPositions = positionsService.getWeeklyPositions();
         Collections.reverse(weeklyPositions);
         return weeklyPositions;
+    }
+
+    @GetMapping(value = "/positions/monthly")
+    public List<MonthlyPosition> getMonthlyPositions() {
+        List<MonthlyPosition> monthlyPositions = positionsService.getMonthlyPositions();
+        Collections.reverse(monthlyPositions);
+        return monthlyPositions;
     }
 
     @GetMapping(value = "/decay")

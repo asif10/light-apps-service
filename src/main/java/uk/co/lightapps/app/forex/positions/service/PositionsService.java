@@ -69,6 +69,10 @@ public class PositionsService {
         weeklyRepository.save(position);
     }
 
+    public void save(MonthlyPosition position) {
+        monthlyPositionsRepository.save(position);
+    }
+
     public DailyPosition logDaily(LocalDate date) {
         DailyPosition position = new DailyPosition();
         position.setDate(date);
@@ -165,16 +169,12 @@ public class PositionsService {
         position.setStats(stats);
         position.setRoi(roi);
         position.setFees(fees);
-//        calculateTradesAvailable(position);
         position.setInvested(invested);
-//        position.setTotalPosition(account.getCurrentPosition().getValue());
-//        position.setCurrentProfit(account.getProfit().getValue());
-//        calculateWeeklyTradesAvailable(account, position);
         calculateWinSplit(position, won, returnForWins);
         calculateLossSplit(position, (trades.size() - won), returnForLoss);
         position.setTradesPerWeek(calculateTradesPerWeek(start, endDate, trades.size()));
         position.setTradesPerDay(calculateTradesPerDay(start, endDate, trades.size()));
-//        save(position);
+        save(position);
 
         return position;
     }

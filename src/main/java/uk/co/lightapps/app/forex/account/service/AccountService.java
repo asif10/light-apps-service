@@ -14,6 +14,7 @@ import uk.co.lightapps.app.forex.transactions.services.TransactionService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.function.Predicate;
@@ -206,7 +207,7 @@ public class AccountService {
     }
 
     private double calculateTradesPerDay(Account account) {
-        long days = calculateBusinessDaysPassed();
+        long days = calculateBusinessDaysPassed() + 1;
         return (double) account.getTotalTrades().getTrades() / days;
     }
 
@@ -246,7 +247,7 @@ public class AccountService {
     }
 
     private void calculateMaxTrades(Account account) {
-        long days = calculateBusinessDaysPassed();
+        long days = calculateBusinessDaysPassed() + 1;
         long total = days * Constant.TRADES_PER_DAY;
         account.setMaxTrades(new Figure(total, (double) account.getTotalTrades().getTrades() / total));
     }
@@ -289,8 +290,9 @@ public class AccountService {
     }
 
     private List<Trade> getTrades(LocalDateTime start, LocalDateTime end) {
-        System.out.println(start + " - " + end);
-        return tradeService.getAll().stream().filter(e -> e.getDate().compareTo(start) >= 0 && e.getDate().compareTo(end) <= 0).collect(Collectors.toList());
+        LocalDateTime startDate = LocalDateTime.of(start.toLocalDate(), LocalTime.MIN);
+        LocalDateTime endDate = LocalDateTime.of(end.toLocalDate(), LocalTime.MAX);
+        return tradeService.getAll().stream().filter(e -> e.getDate().compareTo(startDate) >= 0 && e.getDate().compareTo(endDate) <= 0).collect(Collectors.toList());
     }
 
     private LocalDateTime calculateStartOfWeek() {
