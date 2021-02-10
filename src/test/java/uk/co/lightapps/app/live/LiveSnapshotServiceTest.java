@@ -6,12 +6,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.co.lightapps.app.forex.history.domain.MonthlySnapshot;
 import uk.co.lightapps.app.forex.history.domain.Snapshot;
 import uk.co.lightapps.app.forex.history.service.SnapshotService;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+import static java.time.format.DateTimeFormatter.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static uk.co.lightapps.app.trades.TradesTest.rounded;
+import static uk.co.lightapps.app.trades.TradesTest.rounded2dp;
 
 /**
  * @author Asif Akhtar
@@ -23,13 +29,7 @@ import static uk.co.lightapps.app.trades.TradesTest.rounded;
 public class LiveSnapshotServiceTest {
     @Autowired
     private SnapshotService service;
-// 11 	 2.36 	 11 	 15 	42.31%	-259	-3.25
 
-    //	TRADES	WINS	LOSSES		RETURN	AVG	 PIPS 	 + 	 - 		WINS
-    // 301 	 16 	 9 	 7 	56.3%	+ 0.28 	+ 0.02 	- 51.00	+ 21 	- 68		+ 0.38
-    // 302 	 7 	 1 	 6 	14.3%	- 2.95	- 0.42	- 186.00	+ 14 			+ 3.44
-    // 303 	 1 	 -   	 1 	0.0%	- 0.30		- 19.00	#DIV/0!			#DIV/0!
-    // 304 	 2 	 1 	 1 	50.0%	- 0.14		- 3.00	+ 19 			+ 2.83
     @Test
     public void check_weekly_position() throws Exception {
         Snapshot snapshot = service.calculateLastWeek();
@@ -38,4 +38,41 @@ public class LiveSnapshotServiceTest {
         assertThat(rounded(snapshot.getRr()), is(-3.25));
     }
 
+    @Test
+    public void check_current_month() throws Exception {
+        MonthlySnapshot month = service.currentMonth();
+        assertThat(month.getMonth().format(ofPattern("ddMMyyyy")), is(LocalDate.now().format(ofPattern("01022021"))));
+
+        assertThat(month.getStats().getTrades(), is(13L));
+        assertThat(month.getStats().getWon(), is(8L));
+        assertThat(month.getStats().getLost(), is(5L));
+        assertThat(rounded2dp(month.getStats().getWinRatio()), is(0.62));
+        assertThat(rounded2dp(month.getStats().getRr()), is(4.58));
+        assertThat(rounded2dp(month.getStats().getPips()), is(-4.00));
+        assertThat(rounded2dp(month.getFees()), is(-0.10));
+
+        assertThat(rounded2dp(month.getInvested()), is(78.00));
+        assertThat(rounded2dp(month.getProfit().getValue()), is(-0.70));
+        assertThat(rounded(month.getProfit().getPercentage()), is(-0.0090));
+        assertThat(rounded(month.getOpen()), is(594.14));
+        assertThat(rounded(month.getClosed()), is(593.44));
+
+        assertThat(rounded2dp(month.getManualWins().getValue()), is(6.0));
+        assertThat(rounded2dp(month.getManualWins().getPercentage()), is(1.00));
+
+        assertThat(rounded2dp(month.getTpWins().getValue()), is(0.0));
+        assertThat(rounded2dp(month.getTpWins().getPercentage()), is(0.0));
+
+        assertThat(month.getPrevious().getTrades(), is(63L));
+        assertThat(month.getPrevious().getWon(), is(30L));
+        assertThat(month.getPrevious().getLost(), is(33L));
+        assertThat(rounded(month.getPrevious().getWinRatio()), is(0.4762));
+
+        assertThat(month.getMaxTrades(), is(60L));
+
+        assertThat(rounded2dp(month.getTradesPerDay()), is(2.17));
+        assertThat(rounded2dp(month.getTradesPerWeek()), is(9.00));
+
+
+    }
 }

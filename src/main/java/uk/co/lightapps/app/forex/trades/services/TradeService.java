@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.co.lightapps.app.forex.positions.domain.WeeklyPosition;
 import uk.co.lightapps.app.forex.positions.repository.WeeklyPositionsRepository;
-import uk.co.lightapps.app.forex.positions.service.PositionsService;
 import uk.co.lightapps.app.forex.trades.domain.Trade;
 import uk.co.lightapps.app.forex.trades.domain.TradesGroup;
 import uk.co.lightapps.app.forex.trades.repository.TradeRepository;
@@ -45,13 +44,13 @@ public class TradeService {
         return repository.findById(id);
     }
 
-    public List<Trade> getAll() {
+    public List<Trade> findAll() {
         return repository.findAll();
     }
 
     public List<TradesGroup> getTradesGrouped() {
         List<TradesGroup> groupedTrades = new ArrayList<>();
-        List<Trade> all = getAll();
+        List<Trade> all = findAll();
         List<WeeklyPosition> weeklyPositions = positionsRepository.findAll();
         weeklyPositions.forEach(week -> groupedTrades.add(groupWeek(week.getDate(), all)));
         WeeklyPosition latest = weeklyPositions.get(weeklyPositions.size() - 1);
@@ -75,7 +74,7 @@ public class TradeService {
     }
 
     public List<Trade> getOpenTrades() {
-        return getAll().stream().filter(this::isOpen).collect(Collectors.toList());
+        return findAll().stream().filter(this::isOpen).collect(Collectors.toList());
     }
 
     private boolean isOpen(Trade trade) {
@@ -104,14 +103,14 @@ public class TradeService {
         save(trade);
     }
 
-    public List<Trade> getAll(LocalDate date) {
-        return getAll(date, date);
+    public List<Trade> findAll(LocalDate date) {
+        return findAll(date, date);
     }
 
-    public List<Trade> getAll(LocalDate start, LocalDate end) {
+    public List<Trade> findAll(LocalDate start, LocalDate end) {
         LocalDateTime startDate = LocalDateTime.of(start, LocalTime.MIN);
         LocalDateTime endDate = LocalDateTime.of(end, LocalTime.MAX);
-        return getAll().stream().filter(e -> e.getDate().compareTo(startDate) >= 0 && e.getDate().compareTo(endDate) < 1).collect(Collectors.toList());
+        return findAll().stream().filter(e -> e.getDate().compareTo(startDate) >= 0 && e.getDate().compareTo(endDate) < 1).collect(Collectors.toList());
     }
 
     public void delete(String tradeId) {
@@ -119,6 +118,6 @@ public class TradeService {
     }
 
     public List<Trade> getByStrategy(int strategy) {
-        return getAll().stream().filter(e -> e.getStrategy().equals("" + strategy)).collect(Collectors.toList());
+        return findAll().stream().filter(e -> e.getStrategy().equals("" + strategy)).collect(Collectors.toList());
     }
 }

@@ -40,7 +40,7 @@ public class ForexController {
 
     @GetMapping(value = "/trades")
     public List<Trade> trades() {
-        List<Trade> trades = service.getAll();
+        List<Trade> trades = service.findAll();
         Collections.reverse(trades);
         return trades;
     }
@@ -77,7 +77,7 @@ public class ForexController {
 
     @PostMapping(value = "/positions/daily/save")
     public DailyPosition saveDailyPosition() {
-        return positionsService.logDaily(LocalDate.now());
+        return positionsService.logDaily(LocalDate.now().minusDays(1));
     }
 
     @PostMapping(value = "/positions/weekly/save")
@@ -111,7 +111,7 @@ public class ForexController {
         DecayOptions options = DecayOptions.builder()
                 .account(accountService.getAccountInfo())
                 .weeklyPositions(positionsService.getWeeklyPositions())
-                .trades(service.getAll())
+                .trades(service.findAll())
                 .build();
         return decayService.calculateDecay(options);
     }

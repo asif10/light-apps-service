@@ -23,7 +23,9 @@ public class StrategiesService {
                 createStrategy(301),
                 createStrategy(302),
                 createStrategy(303),
-                createStrategy(304)
+                createStrategy(304),
+                createStrategy(501),
+                createStrategy(502)
         );
     }
 
@@ -78,6 +80,10 @@ public class StrategiesService {
                 return "PRICE CONTINUATION";
             case 303:
                 return "TREND BREAKS";
+            case 501:
+                return "PRICE REVERSAL";
+            case 502:
+                return "TREND CONTINUATION";
             default:
                 return "CHANNEL BREAKS";
         }

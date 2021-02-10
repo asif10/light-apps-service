@@ -21,8 +21,8 @@ public class ForexStatsService {
     public ForexStats calculateStats() {
         ForexStats stats = new ForexStats();
 
-        calculateWinTrades(stats, tradeService.getAll());
-        calculateLossTrades(stats, tradeService.getAll());
+        calculateWinTrades(stats, tradeService.findAll());
+        calculateLossTrades(stats, tradeService.findAll());
         return stats;
     }
 

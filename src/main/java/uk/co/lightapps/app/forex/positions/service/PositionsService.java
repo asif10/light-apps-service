@@ -19,12 +19,11 @@ import uk.co.lightapps.app.forex.positions.repository.WeeklyPositionsRepository;
 import uk.co.lightapps.app.forex.trades.domain.Trade;
 import uk.co.lightapps.app.forex.trades.services.TradeService;
 
-import javax.swing.text.PlainDocument;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static uk.co.lightapps.app.forex.account.service.AccountService.calculateBusinessDays;
+import static uk.co.lightapps.app.shared.CommonUtils.*;
 
 /**
  * @author Asif Akhtar
@@ -86,11 +85,11 @@ public class PositionsService {
         Account account = accountService.getAccountInfo();
         DecayOptions options = DecayOptions.builder()
                 .account(account)
-                .trades(tradeService.getAll())
+                .trades(tradeService.findAll())
                 .build();
         Decay decay = decayService.calculateDecay(options);
 
-        List<Trade> trades = tradeService.getAll(position.getDate());
+        List<Trade> trades = tradeService.findAll(position.getDate());
 
         double fees = trades.stream().mapToDouble(Trade::getFees).sum();
         double changed;
@@ -125,7 +124,7 @@ public class PositionsService {
         LocalDate endDate = start.plusMonths(1).minusDays(1);
         Account account = accountService.getAccountInfo(date);
 
-        List<Trade> trades = tradeService.getAll(start, endDate);
+        List<Trade> trades = tradeService.findAll(start, endDate);
         Optional<MonthlyPosition> current = getMonth();
         if (current.isPresent() && current.get().getDate().equals(date)) {
             monthlyPositionsRepository.deleteById(current.get().getPositionId());
@@ -186,14 +185,14 @@ public class PositionsService {
 
     private double calculateTradesPerWeek(LocalDate start, LocalDate end, int trades) {
         long days = calculateBusinessDays(start, end);
-        return (double) trades / (double) (days / 5);
+        return (double) trades / (double) (days / TRADING_DAYS);
     }
 
     private void calculateWinSplit(MonthlyPosition position, double wins, double profit) {
         PLSplit split = new PLSplit();
         split.setReturnPerTrade(profit / wins);
         split.setTotalReturn(profit);
-        split.setPercentage(split.getReturnPerTrade() / 6);
+        split.setPercentage(split.getReturnPerTrade() / TRADE_AMOUNT);
         position.setWinsSplit(split);
     }
 
@@ -201,7 +200,7 @@ public class PositionsService {
         PLSplit split = new PLSplit();
         split.setReturnPerTrade(profit / wins);
         split.setTotalReturn(profit);
-        split.setPercentage(split.getReturnPerTrade() / 6);
+        split.setPercentage(split.getReturnPerTrade() / TRADE_AMOUNT);
         position.setLossesSplit(split);
     }
 
@@ -217,7 +216,7 @@ public class PositionsService {
 
         Account account = accountService.getAccountInfo();
         LocalDate start = position.getDate();
-        List<Trade> trades = tradeService.getAll(start.minusDays(5), start);
+        List<Trade> trades = tradeService.findAll(start.minusDays(5), start);
         long won = trades.stream().filter(e -> e.getProfit() > 0).count();
 
         double fees = trades.stream().mapToDouble(Trade::getFees).sum();
@@ -260,7 +259,7 @@ public class PositionsService {
     }
 
     private void calculateTradesAvailable(WeeklyPosition position) {
-        List<Trade> trades = tradeService.getAll();
+        List<Trade> trades = tradeService.findAll();
         Optional<WeeklyPosition> firstWeek = getFirstWeek();
         double startOfWeek = position.getStart();
         if (firstWeek.isPresent()) {

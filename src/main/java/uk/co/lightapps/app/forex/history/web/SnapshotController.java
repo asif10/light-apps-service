@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.co.lightapps.app.forex.history.domain.MonthlySnapshot;
 import uk.co.lightapps.app.forex.history.domain.Snapshot;
 import uk.co.lightapps.app.forex.history.service.SnapshotService;
 
@@ -22,5 +23,10 @@ public class SnapshotController {
     @GetMapping(value = "/last-week")
     public Snapshot lastWeek() {
         return service.calculateLastWeek();
+    }
+
+    @GetMapping(value = "/monthly/current")
+    public MonthlySnapshot thisMonth() {
+        return service.currentMonth();
     }
 }

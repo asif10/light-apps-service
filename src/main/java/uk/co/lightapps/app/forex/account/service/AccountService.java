@@ -2,12 +2,9 @@ package uk.co.lightapps.app.forex.account.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.co.lightapps.app.forex.Constant;
 import uk.co.lightapps.app.forex.account.domain.Account;
 import uk.co.lightapps.app.forex.account.domain.Figure;
 import uk.co.lightapps.app.forex.account.domain.TradeStats;
-import uk.co.lightapps.app.forex.decay.domain.Decay;
-import uk.co.lightapps.app.forex.decay.services.DecayService;
 import uk.co.lightapps.app.forex.trades.domain.Trade;
 import uk.co.lightapps.app.forex.trades.services.TradeService;
 import uk.co.lightapps.app.forex.transactions.services.TransactionService;
@@ -22,6 +19,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.time.DayOfWeek.*;
+import static uk.co.lightapps.app.shared.CommonUtils.TRADES_PER_DAY;
+import static uk.co.lightapps.app.shared.CommonUtils.calculateBusinessDays;
 
 /**
  * @author Asif Akhtar
@@ -42,11 +41,11 @@ public class AccountService {
     }
 
     public double sumTradesReturnValue() {
-        return tradeService.getAll().stream().mapToDouble(Trade::getProfit).sum();
+        return tradeService.findAll().stream().mapToDouble(Trade::getProfit).sum();
     }
 
     public double sumTradesFeesValue() {
-        return tradeService.getAll().stream().mapToDouble(Trade::getFees).sum();
+        return tradeService.findAll().stream().mapToDouble(Trade::getFees).sum();
     }
 
     public double calculateDepositAmount() {
@@ -98,7 +97,7 @@ public class AccountService {
 
         account.setTradesPerWeek(calculateTradesPerWeek(account));
 
-        List<Trade> trades = tradeService.getAll();
+        List<Trade> trades = tradeService.findAll();
 
         account.setRrPerDay(calculateRrPerDay(account, trades));
         account.setRrPerWeek(calculateRrPerWeek(account, trades));
@@ -230,25 +229,14 @@ public class AccountService {
         return calculateBusinessDays(LocalDate.of(2021, 1, 1), LocalDate.now());
     }
 
-    public static long calculateBusinessDays(LocalDate startDate, LocalDate endDate) {
-        Predicate<LocalDate> isWeekend = date -> date.getDayOfWeek() == SATURDAY || date.getDayOfWeek() == SUNDAY;
-
-        long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
-        long days = Stream.iterate(startDate, date -> date.plusDays(1)).limit(daysBetween).filter(isWeekend.negate()).count();
-        if (startDate.getMonthValue() == 1) {
-            days -= 1;
-        }
-        return days;
-    }
-
     private double calculateMaxTradesThisWeek() {
         int day = LocalDate.now().getDayOfWeek().getValue();
-        return Math.min(day, 5) * Constant.TRADES_PER_DAY;
+        return Math.min(day, 5) * TRADES_PER_DAY;
     }
 
     private void calculateMaxTrades(Account account) {
         long days = calculateBusinessDaysPassed() + 1;
-        long total = days * Constant.TRADES_PER_DAY;
+        long total = days * TRADES_PER_DAY;
         account.setMaxTrades(new Figure(total, (double) account.getTotalTrades().getTrades() / total));
     }
 
@@ -267,11 +255,11 @@ public class AccountService {
     }
 
     private TradeStats calculateTotalTrades() {
-        return calculateTotalTrades(tradeService.getAll());
+        return calculateTotalTrades(tradeService.findAll());
     }
 
     private TradeStats calculateTotalTrades(LocalDate date) {
-        return calculateTotalTrades(tradeService.getAll(date, endOfMonth(date)));
+        return calculateTotalTrades(tradeService.findAll(date, endOfMonth(date)));
     }
 
     private LocalDate endOfMonth(LocalDate date) {
@@ -292,7 +280,7 @@ public class AccountService {
     private List<Trade> getTrades(LocalDateTime start, LocalDateTime end) {
         LocalDateTime startDate = LocalDateTime.of(start.toLocalDate(), LocalTime.MIN);
         LocalDateTime endDate = LocalDateTime.of(end.toLocalDate(), LocalTime.MAX);
-        return tradeService.getAll().stream().filter(e -> e.getDate().compareTo(startDate) >= 0 && e.getDate().compareTo(endDate) <= 0).collect(Collectors.toList());
+        return tradeService.findAll().stream().filter(e -> e.getDate().compareTo(startDate) >= 0 && e.getDate().compareTo(endDate) <= 0).collect(Collectors.toList());
     }
 
     private LocalDateTime calculateStartOfWeek() {

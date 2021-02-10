@@ -1,8 +1,5 @@
 package uk.co.lightapps.app.live;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +39,7 @@ public class LiveDecayServiceTest {
         DecayOptions options = DecayOptions.builder()
                 .account(accountService.getAccountInfo())
                 .weeklyPositions(positionsService.getWeeklyPositions())
-                .trades(tradeService.getAll())
+                .trades(tradeService.findAll())
                 .build();
 
         Decay decay = service.calculateDecay(options);
