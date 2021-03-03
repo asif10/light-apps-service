@@ -82,7 +82,7 @@ public class ForexController {
 
     @PostMapping(value = "/positions/weekly/save")
     public WeeklyPosition saveWeeklyPosition() {
-        return positionsService.logWeekly(LocalDate.now());
+        return positionsService.logWeekly(LocalDate.now(), true);
     }
 
     @GetMapping(value = "/positions/daily")
@@ -94,7 +94,7 @@ public class ForexController {
 
     @GetMapping(value = "/positions/weekly")
     public List<WeeklyPosition> getWeeklyPositions() {
-        List<WeeklyPosition> weeklyPositions = positionsService.getWeeklyPositions();
+        List<WeeklyPosition> weeklyPositions = positionsService.getCurrentWeeklyPositions();
         Collections.reverse(weeklyPositions);
         return weeklyPositions;
     }

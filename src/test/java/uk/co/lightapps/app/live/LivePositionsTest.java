@@ -32,7 +32,7 @@ public class LivePositionsTest {
     @Test
     public void check_weekly_position() throws Exception {
 //        positionsService.deleteAllWeekly();
-        WeeklyPosition saved = positionsService.logWeekly(LocalDate.of(2021, 1, 8));
+        WeeklyPosition saved = positionsService.logWeekly(LocalDate.of(2021, 1, 8),true);
 
         assertThat(rounded(saved.getStart()), is(600.70));
         assertThat(rounded(saved.getEnd()), is(598.83));
@@ -60,7 +60,8 @@ public class LivePositionsTest {
 
     @Test
     public void log_today() throws Exception {
-//        LocalDate week = LocalDate.of(2021, 2, 5);
+//        LocalDate week = LocalDate.of(2021, 2, 12);
+//        positionsService.logDaily(week);
         positionsService.logDaily(LocalDate.now().minusDays(1));
     }
 
@@ -68,7 +69,7 @@ public class LivePositionsTest {
     public void test_current_week() throws Exception {
         LocalDate week = LocalDate.of(2021, 1, 15);
         positionsService.deleteWeek(week);
-        WeeklyPosition saved = positionsService.logWeekly(week);
+        WeeklyPosition saved = positionsService.logWeekly(week,true);
 //
 //        assertThat(rounded(saved.getStart()), is(600.70));
 //        assertThat(rounded(saved.getEnd()), is(598.83));

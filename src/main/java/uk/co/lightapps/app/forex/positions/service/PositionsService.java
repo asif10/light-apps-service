@@ -19,10 +19,15 @@ import uk.co.lightapps.app.forex.positions.repository.WeeklyPositionsRepository;
 import uk.co.lightapps.app.forex.trades.domain.Trade;
 import uk.co.lightapps.app.forex.trades.services.TradeService;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import static java.time.temporal.ChronoField.*;
 import static uk.co.lightapps.app.shared.CommonUtils.*;
 
 /**
@@ -47,12 +52,65 @@ public class PositionsService {
         weeklyRepository.save(position);
     }
 
+    public static LocalDate getLastWorkingDayOfMonth(LocalDate date) {
+        LocalDate lastDayOfMonth;
+        switch (DayOfWeek.of(date.get(DAY_OF_WEEK))) {
+            case SATURDAY:
+                lastDayOfMonth = date.minusDays(1);
+                break;
+            case SUNDAY:
+                lastDayOfMonth = date.minusDays(2);
+                break;
+            default:
+                lastDayOfMonth = date;
+        }
+        return lastDayOfMonth;
+    }
+
     public List<DailyPosition> getDailyPositions() {
         return dailyRepository.findAll();
     }
 
+    public List<DailyPosition> getDailyPositionsThisMonth() {
+        LocalDate start = getLastWorkingDayOfMonth(LocalDate.now().withDayOfMonth(1).minusDays(1));
+        LocalDate end = start.plusMonths(1);
+
+        return getDailyPositions(start, end);
+    }
+
+    public List<DailyPosition> getDailyPositions(LocalDate start, LocalDate end) {
+        return dailyRepository.findAll().stream().filter(e -> e.getDate().compareTo(start) >= 0 && e.getDate().compareTo(end) < 1).collect(Collectors.toList());
+    }
+
     public List<WeeklyPosition> getWeeklyPositions() {
         return weeklyRepository.findAll();
+    }
+
+    public List<WeeklyPosition> getCurrentWeeklyPositions() {
+        WeeklyPosition weeklyPosition = logWeekly(startOfWeek(), false);
+        List<WeeklyPosition> all = weeklyRepository.findAll();
+        all.add(weeklyPosition);
+        return all;
+    }
+
+    private LocalDate startOfWeek() {
+        LocalDate now = LocalDate.now();
+        switch (DayOfWeek.of(now.get(DAY_OF_WEEK))) {
+            case SUNDAY:
+                return now.plusDays(6);
+            case MONDAY:
+                return now.plusDays(5);
+            case TUESDAY:
+                return now.plusDays(4);
+            case WEDNESDAY:
+                return now.plusDays(3);
+            case THURSDAY:
+                return now.plusDays(2);
+            case FRIDAY:
+                return now.plusDays(1);
+            default:
+                return now;
+        }
     }
 
     public List<MonthlyPosition> getMonthlyPositions() {
@@ -204,7 +262,7 @@ public class PositionsService {
         position.setLossesSplit(split);
     }
 
-    public WeeklyPosition logWeekly(LocalDate date) {
+    public WeeklyPosition logWeekly(LocalDate date, boolean save) {
         WeeklyPosition position = new WeeklyPosition();
         position.setDate(date);
 
@@ -246,7 +304,9 @@ public class PositionsService {
         position.setTotalPosition(account.getCurrentPosition().getValue());
         position.setCurrentProfit(account.getProfit().getValue());
         calculateWeeklyTradesAvailable(account, position);
-        save(position);
+        if (save) {
+            save(position);
+        }
         return position;
     }
 
@@ -311,6 +371,15 @@ public class PositionsService {
         } else {
             return Optional.empty();
         }
+    }
+
+    public Optional<MonthlyPosition> getMonth(LocalDate date) {
+        List<MonthlyPosition> all = getMonthlyPositions();
+        return all.stream().filter(e -> isMatch(e.getDate(), date)).collect(Collectors.toList()).stream().findFirst();
+    }
+
+    private boolean isMatch(LocalDate date1, LocalDate date2) {
+        return date1.format(DateTimeFormatter.ofPattern("ddMMyyyy")).equals(date2.format(DateTimeFormatter.ofPattern("ddMMyyyy")));
     }
 
     public void deleteWeek(LocalDate week) {

@@ -48,9 +48,20 @@ public class SnapshotService {
     }
 
     public MonthlySnapshot currentMonth() {
-
         LocalDate start = LocalDate.now().withDayOfMonth(1);
         LocalDate end = start.plusMonths(1).minusDays(1);
+        return createMonthlySnapshot(start, end);
+    }
+
+    public MonthlySnapshot previousMonth() {
+        LocalDate start = LocalDate.now().withDayOfMonth(1);
+        LocalDate previousStart = start.minusMonths(1);
+        LocalDate previousEnd = previousStart.plusMonths(1).minusDays(1);
+        MonthlySnapshot snapshot = createMonthlySnapshot(previousStart, previousEnd);
+        return snapshot;
+    }
+
+    public MonthlySnapshot createMonthlySnapshot(LocalDate start, LocalDate end) {
         MonthlySnapshot month = new MonthlySnapshot(start);
         List<Trade> trades = tradeService.findAll(start, end);
         List<Trade> wins = trades.stream().filter(e -> e.getProfit() > 0).collect(Collectors.toList());
@@ -69,7 +80,7 @@ public class SnapshotService {
         month.setInvested(invested);
 
         double open = trades.get(0).getAccount();
-        double closed = accountService.calculateCurrentBalance();
+        double closed = trades.get(trades.size() - 1).getAccount();
         double profit = closed - open;
         month.setProfit(new Figure(profit, profit / invested));
         month.setOpen(open);
@@ -83,10 +94,10 @@ public class SnapshotService {
         month.setManualWins(new Figure(manualWins.size(), (double) manualWins.size() / closedWins));
         month.setTpWins(new Figure(tpWins.size(), (double) tpWins.size() / closedWins));
 
-        MonthlyPosition currentMonth = positionsService.getMonth().orElse(new MonthlyPosition());
-        month.getPrevious().setTrades(currentMonth.getStats().getTrades());
-        month.getPrevious().setWon(currentMonth.getStats().getWon());
-        month.getPrevious().setLost(currentMonth.getStats().getLost());
+        MonthlyPosition currentMonth = positionsService.getMonth(start).orElse(new MonthlyPosition());
+//        month.getPrevious().setTrades(currentMonth.getStats().getTrades());
+//        month.getPrevious().setWon(currentMonth.getStats().getWon());
+//        month.getPrevious().setLost(currentMonth.getStats().getLost());
 
         long days = calculateBusinessDays(start, LocalDate.now()) + 1;
         month.setMaxTrades(calculateBusinessDays(start, end) * TRADES_PER_DAY);

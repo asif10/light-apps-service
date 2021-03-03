@@ -29,4 +29,9 @@ public class SnapshotController {
     public MonthlySnapshot thisMonth() {
         return service.currentMonth();
     }
+
+    @GetMapping(value = "/monthly/previous")
+    public MonthlySnapshot previousMonth() {
+        return service.previousMonth();
+    }
 }

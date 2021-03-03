@@ -18,7 +18,6 @@ import static uk.co.lightapps.app.shared.CommonUtils.calculateBusinessDays;
 public class MonthlySnapshot {
     private LocalDate month;
     private TradeStats stats = new TradeStats();
-    private TradeStats previous = new TradeStats();
     private long maxTrades;
     private double fees;
     private Figure profit;
@@ -36,6 +35,6 @@ public class MonthlySnapshot {
 
     public void calculate() {
         stats.setWinRatio((double) stats.getWon() / stats.getTrades());
-        previous.setWinRatio((double) previous.getWon() / previous.getTrades());
+
     }
 }

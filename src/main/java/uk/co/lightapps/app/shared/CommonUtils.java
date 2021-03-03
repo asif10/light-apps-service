@@ -28,5 +28,8 @@ public final class CommonUtils {
         return days;
     }
 
+//    public int getTradeAmount(){
+//    }
+
 
 }

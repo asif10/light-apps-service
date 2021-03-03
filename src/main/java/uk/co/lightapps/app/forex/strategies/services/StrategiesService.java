@@ -20,12 +20,11 @@ public class StrategiesService {
 
     public List<Strategies> getAllStrategies() {
         return List.of(
-                createStrategy(301),
-                createStrategy(302),
-                createStrategy(303),
-                createStrategy(304),
                 createStrategy(501),
-                createStrategy(502)
+                createStrategy(502),
+                createStrategy(601),
+                createStrategy(602),
+                createStrategy(700)
         );
     }
 
@@ -81,8 +80,11 @@ public class StrategiesService {
             case 303:
                 return "TREND BREAKS";
             case 501:
+            case 601:
                 return "PRICE REVERSAL";
             case 502:
+            case 700:
+            case 602:
                 return "TREND CONTINUATION";
             default:
                 return "CHANNEL BREAKS";

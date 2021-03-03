@@ -132,7 +132,7 @@ public class PositionsTest {
 
     private WeeklyPosition addWeek(LocalDate date, Runnable run) throws Exception {
         run.run();
-        return positionsService.logWeekly(date);
+        return positionsService.logWeekly(date,true);
     }
 
     private void clear() {

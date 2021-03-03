@@ -63,10 +63,10 @@ public class LiveSnapshotServiceTest {
         assertThat(rounded2dp(month.getTpWins().getValue()), is(0.0));
         assertThat(rounded2dp(month.getTpWins().getPercentage()), is(0.0));
 
-        assertThat(month.getPrevious().getTrades(), is(63L));
-        assertThat(month.getPrevious().getWon(), is(30L));
-        assertThat(month.getPrevious().getLost(), is(33L));
-        assertThat(rounded(month.getPrevious().getWinRatio()), is(0.4762));
+//        assertThat(month.getPrevious().getTrades(), is(63L));
+//        assertThat(month.getPrevious().getWon(), is(30L));
+//        assertThat(month.getPrevious().getLost(), is(33L));
+//        assertThat(rounded(month.getPrevious().getWinRatio()), is(0.4762));
 
         assertThat(month.getMaxTrades(), is(60L));
 

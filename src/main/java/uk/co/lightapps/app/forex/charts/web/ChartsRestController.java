@@ -33,4 +33,11 @@ public class ChartsRestController {
         positionsService.getDailyPositions().forEach(day -> chartContent.add(day.getDate().format(DateTimeFormatter.ofPattern("ddMM")), "" + day.getProfit()));
         return chartContent;
     }
+
+    @GetMapping(value = "/positions/monthly/current")
+    public ChartContent currentMonthChartContent() {
+        ChartContent chartContent = new ChartContent();
+        positionsService.getDailyPositionsThisMonth().forEach(day -> chartContent.add(day.getDate().format(DateTimeFormatter.ofPattern("ddMM")), "" + day.getProfit()));
+        return chartContent;
+    }
 }
