@@ -24,7 +24,9 @@ public class StrategiesService {
                 createStrategy(502),
                 createStrategy(601),
                 createStrategy(602),
-                createStrategy(700)
+                createStrategy(700),
+                createStrategy(800),
+                createStrategy(900)
         );
     }
 
@@ -86,6 +88,10 @@ public class StrategiesService {
             case 700:
             case 602:
                 return "TREND CONTINUATION";
+            case 800:
+                return "LT TREND CONTINUATION";
+            case 900:
+                return "ST TREND CONTINUATION";
             default:
                 return "CHANNEL BREAKS";
         }

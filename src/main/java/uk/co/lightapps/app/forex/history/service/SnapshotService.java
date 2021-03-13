@@ -1,6 +1,7 @@
 package uk.co.lightapps.app.forex.history.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.jni.Local;
 import org.springframework.stereotype.Service;
 import uk.co.lightapps.app.forex.account.domain.Figure;
 import uk.co.lightapps.app.forex.account.service.AccountService;
@@ -57,8 +58,7 @@ public class SnapshotService {
         LocalDate start = LocalDate.now().withDayOfMonth(1);
         LocalDate previousStart = start.minusMonths(1);
         LocalDate previousEnd = previousStart.plusMonths(1).minusDays(1);
-        MonthlySnapshot snapshot = createMonthlySnapshot(previousStart, previousEnd);
-        return snapshot;
+        return createMonthlySnapshot(previousStart, previousEnd);
     }
 
     public MonthlySnapshot createMonthlySnapshot(LocalDate start, LocalDate end) {
@@ -79,8 +79,8 @@ public class SnapshotService {
         month.setFees(fees);
         month.setInvested(invested);
 
-        double open = trades.get(0).getAccount();
-        double closed = trades.get(trades.size() - 1).getAccount();
+        double open = calculateBalanceTo(start);
+        double closed = calculateBalanceTo(end);
         double profit = closed - open;
         month.setProfit(new Figure(profit, profit / invested));
         month.setOpen(open);
@@ -111,5 +111,12 @@ public class SnapshotService {
         month.setTradesPerWeek(average);
         month.calculate();
         return month;
+    }
+
+    private double calculateBalanceTo(LocalDate start) {
+        List<Trade> trades = tradeService.findAll(LocalDate.now().minusYears(2), start.minusDays(1));
+        double totalProfit = trades.stream().mapToDouble(Trade::getProfit).sum();
+        double fees = trades.stream().mapToDouble(Trade::getFees).sum();
+        return accountService.calculateStartBalance() + totalProfit + fees;
     }
 }

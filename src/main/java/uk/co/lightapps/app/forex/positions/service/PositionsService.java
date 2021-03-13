@@ -87,9 +87,12 @@ public class PositionsService {
     }
 
     public List<WeeklyPosition> getCurrentWeeklyPositions() {
-        WeeklyPosition weeklyPosition = logWeekly(startOfWeek(), false);
         List<WeeklyPosition> all = weeklyRepository.findAll();
-        all.add(weeklyPosition);
+        Optional<WeeklyPosition> thisWeek = all.stream().filter(e -> e.getDate().equals(startOfWeek())).findFirst();
+        if (thisWeek.isEmpty()) {
+            WeeklyPosition weeklyPosition = logWeekly(startOfWeek(), false);
+            all.add(weeklyPosition);
+        }
         return all;
     }
 
