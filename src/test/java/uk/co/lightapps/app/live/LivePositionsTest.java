@@ -62,7 +62,7 @@ public class LivePositionsTest {
     public void log_today() throws Exception {
 //        LocalDate week = LocalDate.of(2021, 2, 12);
 //        positionsService.logDaily(week);
-        positionsService.logDaily(LocalDate.now().minusDays(1));
+        positionsService.logDaily(LocalDate.now().minusDays(2));
     }
 
     @Test

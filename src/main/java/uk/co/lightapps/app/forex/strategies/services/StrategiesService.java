@@ -6,7 +6,6 @@ import uk.co.lightapps.app.forex.strategies.domain.Strategies;
 import uk.co.lightapps.app.forex.trades.domain.Trade;
 import uk.co.lightapps.app.forex.trades.services.TradeService;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -26,7 +25,8 @@ public class StrategiesService {
                 createStrategy(602),
                 createStrategy(700),
                 createStrategy(800),
-                createStrategy(900)
+                createStrategy(900),
+                createStrategy(1000)
         );
     }
 
@@ -57,7 +57,7 @@ public class StrategiesService {
 
         return Strategies.builder()
                 .id(strategy)
-                .label(label(strategy))
+                .label(strategyLabel(strategy))
                 .description(info(strategy))
                 .trades(trades.size())
                 .won(won)
@@ -73,7 +73,7 @@ public class StrategiesService {
                 .build();
     }
 
-    private String label(int label) {
+    private String strategyLabel(int label) {
         switch (label) {
             case 301:
                 return "PRICE REVERSALS";
@@ -83,6 +83,7 @@ public class StrategiesService {
                 return "TREND BREAKS";
             case 501:
             case 601:
+            case 1000:
                 return "PRICE REVERSAL";
             case 502:
             case 700:
